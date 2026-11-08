@@ -163,7 +163,8 @@ function hints(xml){
     return found?found[2]:null;
   };
   const sections=tags("sectPr"),sizes=tags("pgSz"),margins=tags("pgMar");
-  const hasText=/<(?:[\w.-]+:)?t(?:\s[^>]*)?>[\s\S]*?\S[\s\S]*?<\/(?:[\w.-]+:)?t\s*>/.test(safe);
+  const textMatches=[...safe.matchAll(/<(?:[\w.-]+:)?t(?:\s[^>]*)?>([\s\S]*?)<\/(?:[\w.-]+:)?t\s*>/g)];
+  const hasText=textMatches.some(m=>m[1].trim().length>0);
   let a4=0;
   for(const tag of sizes){
     const w=Number(attr(tag,"w")),h=Number(attr(tag,"h"));
