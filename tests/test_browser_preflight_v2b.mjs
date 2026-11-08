@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {deflateRawSync} from "node:zlib";
+import {readFileSync} from "node:fs";
 import {preflight,MAX_INPUT_BYTES,ENGINE_VERSION} from "../docs/preflight-v2b.mjs";
 
 const encoder=new TextEncoder();
@@ -157,4 +158,22 @@ test("reports never include body text or filenames",async()=>{
 test("embedded objects are flagged but not opened",async()=>{
  const r=await preflight(docx([{name:"word/embeddings/object1.bin",value:"p"}]),"DOCX");
  assert.ok(codes(r).includes("DOCX_EMBEDDED_OBJECTS_UNOPENED"));
+});
+
+test("faked XML root in nested markup fails closed",async()=>{
+ const fake='<root><w:document xmlns:w="x"><w:body/></w:document></root>';
+ const r=await preflight(docx([],fake),"DOCX");
+ assert.equal(r.overall,"FAIL");assert.ok(codes(r).includes("DOCX_XML_ROOT_INVALID"));
+});
+test("site wires local file selector to V2b engine without external scripts",()=>{
+ const root=new URL("../",import.meta.url);
+ const html=readFileSync(new URL("docs/validate.html",root),"utf8");
+ const ui=readFileSync(new URL("docs/validator-ui.mjs",root),"utf8");
+ const core=readFileSync(new URL("docs/preflight-v2b.mjs",root),"utf8");
+ assert.match(html,/id="documentFile"/);
+ assert.match(html,/\.pdf.*\.docx/);
+ assert.match(ui,/import \{preflight,MAX_INPUT_BYTES/);
+ assert.match(ui,/validation=await preflight\(buffer,ext\)/);
+ assert.doesNotMatch(core,/\bfetch\s*\(/);
+ assert.doesNotMatch(html,/<script[^>]+src="https?:\/\//);
 });
