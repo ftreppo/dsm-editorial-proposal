@@ -167,8 +167,9 @@ export function validateDocument(doc, schema) {
   if(findings.length===0)findings.push(...semantic(doc));
   findings.sort((a,b)=>(a.category+a.path+a.code).localeCompare(b.category+b.path+b.code));
   const checks={};
+  const schemaFailed=findings.some(f=>f.category==="schema");
   for(const category of ["schema","metadata","languages","sections","assessment"])
-    checks[category]=status(findings.filter(f=>f.category===category));
+    checks[category]=(schemaFailed&&category!=="schema")?"NOT_TESTED":status(findings.filter(f=>f.category===category));
   for(const category of NOT_TESTED)checks[category]="NOT_TESTED";
   return {
     report_version:"1.0",engine_version:ENGINE_VERSION,
