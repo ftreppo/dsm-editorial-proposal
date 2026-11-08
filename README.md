@@ -23,7 +23,7 @@ An open, versioned proposal for bilingual and accessible educational documents, 
 
 ## Start here — public landing page
 
-A simple IT / DE / EN landing page with instructions and a copyable prompt is staged at [docs/index.html](docs/index.html). To publish it using GitHub Pages after review, follow [PAGES_SETUP.md](PAGES_SETUP.md). The webpage is **not** an online validator and does not accept documents.
+The IT / DE / EN [landing page](docs/index.html) explains the editorial proposal and provides a copyable prompt. A separate [local JSON validator (V1 beta)](docs/validate.html) provides **structural JSON checks on the user's own device**; the document is never uploaded. It does **not** validate PDF/DOCX, LRS equivalence, institutional logo use or editorial fidelity to an original. For publishing and privacy details see [PAGES_SETUP.md](PAGES_SETUP.md) and [validator/README.md](validator/README.md).
 
 ## Contents
 - [Editorial specification](standard/DSM-ES-v0.1.md)

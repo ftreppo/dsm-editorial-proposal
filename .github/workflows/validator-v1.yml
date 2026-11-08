@@ -1,0 +1,61 @@
+name: DSM-ES Validator V1 — offline deterministic tests
+
+on:
+  pull_request:
+    paths:
+      - 'validator/**'
+      - 'specification/**'
+      - 'examples/**'
+      - 'requirements-validator.txt'
+      - 'tests/test_validator_v1.py'
+      - 'tests/test_browser_validator.mjs'
+      - 'docs/validate.html'
+      - 'docs/validator-v1.mjs'
+      - 'docs/specification/**'
+      - '.github/workflows/validator-v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'validator/**'
+      - 'specification/**'
+      - 'examples/**'
+      - 'requirements-validator.txt'
+      - 'tests/test_validator_v1.py'
+      - 'tests/test_browser_validator.mjs'
+      - 'docs/validate.html'
+      - 'docs/validator-v1.mjs'
+      - 'docs/specification/**'
+      - '.github/workflows/validator-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-validator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install JSON Schema validator
+        run: python -m pip install -r requirements-validator.txt
+      - name: Run deterministic tests
+        run: python -m unittest discover -s tests -p 'test_validator_v1.py' -v
+      - name: Run fixture validation (draft translation expected REVIEW, no FAIL)
+        run: python -m validator.cli examples/synthetic-physics.json --json
+      - name: Verify browser schema matches canonical schema
+        run: cmp specification/document.schema.json docs/specification/document.schema.json
+
+  browser-validator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js (built-in test runner only)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run browser-engine tests (no downloads or browser required)
+        run: node --test tests/test_browser_validator.mjs
