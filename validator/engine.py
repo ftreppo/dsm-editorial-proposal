@@ -69,8 +69,11 @@ def validate_document(doc: Any, source_bytes: bytes | None = None,
     findings.sort(key=lambda x: (x["category"], x["path"], x["code"]))
     status = _status(findings)
     checked_categories = ("schema", "metadata", "languages", "sections", "assessment")
+    schema_failed = any(f["category"] == "schema" for f in findings)
+    input_failed = any(f["category"] == "input" for f in findings)
     by_category = {
-        category: _status([f for f in findings if f["category"] == category])
+        category: ("NOT_TESTED" if (schema_failed or input_failed) and category != "schema"
+                   else _status([f for f in findings if f["category"] == category]))
         for category in checked_categories
     }
     for name in UNTESTED:
