@@ -6,7 +6,6 @@ The report never contains document body text, identifiers, filenames or hyperlin
 """
 from __future__ import annotations
 
-from collections import Counter
 import hashlib
 from html.parser import HTMLParser
 from io import BytesIO
@@ -49,16 +48,28 @@ def _report(kind: str, raw: bytes, findings: list[dict[str, str]], metrics: dict
         result = "FAIL"
     else:
         result = "REVIEW"
+    capabilities = {
+        "PDF": frozenset(("file_integrity", "page_geometry", "text_extractability")),
+        "DOCX": frozenset(("file_integrity", "page_geometry",
+                          "text_extractability", "document_structure")),
+        "HTML": frozenset(("file_integrity", "text_extractability",
+                          "document_structure", "basic_accessibility")),
+    }
     categories = ("file_integrity", "page_geometry", "text_extractability",
                   "document_structure", "basic_accessibility")
     checks: dict[str, str] = {}
     for category in categories:
+        active = [f for f in findings if f["category"] == category]
         if not parsed and category != "file_integrity":
             checks[category] = "NOT_TESTED"
-            continue
-        active = [f for f in findings if f["category"] == category]
-        checks[category] = ("FAIL" if any(f["severity"] == "FAIL" for f in active)
-                            else "REVIEW" if active else "PASS")
+        elif any(f["severity"] == "FAIL" for f in active):
+            checks[category] = "FAIL"
+        elif active:
+            checks[category] = "REVIEW"
+        elif category not in capabilities.get(kind, ()):
+            checks[category] = "NOT_TESTED"
+        else:
+            checks[category] = "PASS"
     for category in _NOT_TESTED:
         checks[category] = "NOT_TESTED"
     findings.sort(key=lambda f: (f["category"], f["code"]))
@@ -80,8 +91,8 @@ def _report(kind: str, raw: bytes, findings: list[dict[str, str]], metrics: dict
 
 
 def _a4(width_mm: float, height_mm: float) -> bool:
-    return (abs(width_mm - 210) <= PAGE_TOL_MM
-            and abs(height_mm - 297) <= PAGE_TOL_MM)
+    return (abs(width_mm - A4_MM[0]) <= PAGE_TOL_MM
+            and abs(height_mm - A4_MM[1]) <= PAGE_TOL_MM)
 
 
 def _pdf(raw: bytes) -> tuple[list[dict[str, str]], dict[str, Any]]:
@@ -238,7 +249,7 @@ class _SafeHTML(HTMLParser):
         self.script = 0
         self.element_count = 0
         self.body_text_chunks = 0
-        self._in_hidden = 0
+        self._skip_text_depth = 0
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         self.element_count += 1
@@ -255,9 +266,15 @@ class _SafeHTML(HTMLParser):
             self.images_no_alt += 1
         if tag == "script":
             self.script += 1
+        if tag in {"script", "style", "template"}:
+            self._skip_text_depth += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in {"script", "style", "template"} and self._skip_text_depth:
+            self._skip_text_depth -= 1
 
     def handle_data(self, data: str) -> None:
-        if data.strip():
+        if not self._skip_text_depth and data.strip():
             self.body_text_chunks += 1
 
 
