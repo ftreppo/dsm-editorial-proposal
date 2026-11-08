@@ -165,7 +165,7 @@ test("faked XML root in nested markup fails closed",async()=>{
  const r=await preflight(docx([],fake),"DOCX");
  assert.equal(r.overall,"FAIL");assert.ok(codes(r).includes("DOCX_XML_ROOT_INVALID"));
 });
-test("site wires local file selector to V2b engine without external scripts",()=>{
+test("site wires local file selector to PDF.js for PDF and V2b for DOCX",()=>{
  const root=new URL("../",import.meta.url);
  const html=readFileSync(new URL("docs/validate.html",root),"utf8");
  const ui=readFileSync(new URL("docs/validator-ui.mjs",root),"utf8");
@@ -173,7 +173,7 @@ test("site wires local file selector to V2b engine without external scripts",()=
  assert.match(html,/id="documentFile"/);
  assert.match(html,/\.pdf.*\.docx/);
  assert.match(ui,/import \{preflight,MAX_INPUT_BYTES/);
- assert.match(ui,/validation=await preflight\(buffer,ext\)/);
+ assert.match(ui,/validation=ext==="pdf"\?await inspectPdf\(buffer\):await preflight\(buffer,ext\)/);
  assert.doesNotMatch(core,/\bfetch\s*\(/);
  assert.doesNotMatch(html,/<script[^>]+src="https?:\/\//);
 });
