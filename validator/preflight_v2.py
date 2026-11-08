@@ -51,7 +51,7 @@ def _report(kind: str, raw: bytes, findings: list[dict[str, str]], metrics: dict
     capabilities = {
         "PDF": frozenset(("file_integrity", "page_geometry", "text_extractability")),
         "DOCX": frozenset(("file_integrity", "page_geometry",
-                          "text_extractability", "document_structure")),
+                          "text_extractability")),
         "HTML": frozenset(("file_integrity", "text_extractability",
                           "document_structure", "basic_accessibility")),
     }
