@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Validatore locale DSM-ES V1: controlli strutturali di JSON, senza upload e senza server.">
+<title>DSM-ES · Verifica documento JSON · V1</title>
+<style>
+:root{--ink:#20272d;--muted:#58636d;--paper:#fbfaf7;--surface:#fff;--line:#d9dedf;--accent:#244b5f;--focus:#a06317}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:var(--ink)}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.wrap{max-width:840px;margin:0 auto;padding:24px}
+header{border-bottom:1px solid var(--line);background:var(--surface)}
+.head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px}
+nav{display:flex;gap:14px;align-items:center}
+h1{font-size:clamp(2rem,4.5vw,3rem);line-height:1.12;margin:14px 0 22px;letter-spacing:-.03em}
+h2{font-size:1.2rem;margin:26px 0 12px}
+.eyebrow{font-size:.75rem;font-weight:750;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.lede{font-size:1.1rem;color:var(--muted)}
+.card{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:24px;margin:20px 0}
+label{display:block;font-weight:700;margin-bottom:10px}
+input[type=file]{width:100%;border:1px dashed #8b9aa1;padding:16px;border-radius:8px;background:#fafbfb;min-height:64px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+button,.button{border-radius:8px;padding:10px 16px;border:1px solid var(--accent);font:inherit;font-weight:650;cursor:pointer;background:var(--accent);color:#fff}
+button:disabled{cursor:not-allowed;opacity:.55}
+button.secondary,.button.secondary{background:white;color:var(--accent)}
+button:hover:not(:disabled){filter:brightness(.9)}
+.langs{display:flex;gap:5px}
+.langs button{padding:4px 9px;font-size:.85rem;background:transparent;color:var(--ink);border:1px solid var(--line)}
+.langs button[aria-pressed=true]{background:var(--accent);color:white}
+.fineprint{font-size:.9rem;color:var(--muted)}
+.status{font-size:1.4rem;font-weight:800;letter-spacing:.02em}
+.status.PASS{color:#17663a}
+.status.REVIEW{color:#936008}
+.status.FAIL,.status.INPUT_ERROR{color:#a12f29}
+.status.NOT_TESTED{color:var(--muted)}
+.report{display:none}
+.report.visible{display:block}
+.finding{padding:12px 0;border-top:1px solid var(--line)}
+.finding strong{display:block}
+.finding p{margin:3px 0 0;font-size:.92rem;color:var(--muted)}
+.report-meta{overflow-wrap:anywhere;font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;background:#f1f4f4;padding:14px;border-radius:8px}
+.notice{border-left:3px solid var(--accent);padding:5px 0 5px 18px;color:var(--muted)}
+.skip{position:absolute;left:-9999px;top:0;padding:10px;background:white;z-index:5}
+.skip:focus{left:10px}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;padding:18px 0;margin-top:36px}
+@media(max-width:650px){.wrap{padding:18px}.card{padding:17px}}
+</style>
+<script type="module" src="./validator-ui.mjs"></script>
+</head>
+<body>
+<a href="#main" class="skip">Skip to content</a>
+<header><div class="wrap head"><nav aria-label="Primary">
+ <a href="./" id="back">← DSM-ES</a>
+ <a href="https://github.com/ftreppo/dsm-editorial-proposal" target="_blank" rel="noopener">GitHub</a>
+</nav><div class="langs" role="group" aria-label="Lingua / Sprache / Language">
+<button type="button" data-lang="it" aria-pressed="true">IT</button>
+<button type="button" data-lang="de" aria-pressed="false">DE</button>
+<button type="button" data-lang="en" aria-pressed="false">EN</button>
+</div></div></header>
+<main id="main" class="wrap">
+ <div class="eyebrow">DSM-ES-VALIDATOR-001 · V1 · COMMUNITY PROPOSAL</div>
+ <h1 data-i18n="title">Verifica locale di un documento JSON</h1>
+ <p class="lede" data-i18n="lede">La prima versione controlla struttura, metadati, lingue, esercizi e punteggi. Il documento resta nel tuo browser: nessun caricamento su GitHub o su server esterni.</p>
+ <section class="card" aria-label="Validate file">
+   <label for="jsonFile" data-i18n="choose">Seleziona un documento strutturato (.json, max 2 MiB)</label>
+   <input type="file" id="jsonFile" accept="application/json,.json" aria-describedby="fileHelp">
+   <p id="fileHelp" class="fineprint" data-i18n="format">PDF e Word non sono supportati da questa versione. I file devono seguire lo schema DSM-ES v0.1.</p>
+   <div class="controls">
+     <button type="button" id="run" data-i18n="run">Verifica il documento</button>
+     <a href="https://github.com/ftreppo/dsm-editorial-proposal/blob/main/examples/synthetic-physics.json" target="_blank" rel="noopener" class="button secondary" id="example" data-i18n="example">Scarica un esempio JSON</a>
+   </div>
+ </section>
+ <section id="reportSection" class="card report" aria-live="polite" aria-atomic="false">
+   <div class="eyebrow" data-i18n="result">Rapporto V1 · Solo controlli eseguiti</div>
+   <div id="status" class="status"></div>
+   <p id="statusExplanation" class="fineprint"></p>
+   <h2 data-i18n="findingsTitle">Osservazioni</h2>
+   <div id="findings"></div>
+   <h2 data-i18n="coverageTitle">Copertura</h2>
+   <p class="fineprint" data-i18n="coverage">Non verificati: identità visiva, PDF/UA, equivalenza didattica, misure LRS, fedeltà all'originale e correttezza della traduzione.</p>
+   <div id="reportHash" class="report-meta"></div>
+   <div class="controls">
+     <button type="button" class="secondary" id="save" data-i18n="save">Scarica il rapporto JSON</button>
+   </div>
+ </section>
+ <p class="notice"><strong data-i18n="privacyHeading">Privacy e limiti.</strong> <span data-i18n="privacy">Il file viene letto esclusivamente nel browser; viene richiesto al sito soltanto lo schema pubblico delle regole. Nessun contenuto del documento o risultato viene trasmesso. PASS non significa conformità totale né approvazione della scuola.</span></p>
+ <p class="fineprint"><a href="https://github.com/ftreppo/dsm-editorial-proposal/blob/main/validator/README.md" target="_blank" rel="noopener" data-i18n="docs">Leggi i limiti e la CLI del validatore</a></p>
+</main>
+<footer><div class="wrap">DSM Editorial Standard · Proposta non ufficiale · Franco Treppo, 8.11.2026</div></footer>
+</body>
+</html>
