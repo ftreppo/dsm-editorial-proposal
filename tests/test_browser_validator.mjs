@@ -39,6 +39,10 @@ test("unknown root property rejected",()=>{
   const d=copy(fixture);d.unknown="x";
   assert.ok(codes(report(d)).includes("SCHEMA_ADDITIONALPROPERTIES"));
 });
+test("early-year valid date is accepted",()=>{
+  const d=copy(fixture);d.date="0099-01-01";d.translation_status="REVIEWED";
+  assert.equal(report(d).overall,"PASS");
+});
 test("invalid 2026-02-30 date rejected",()=>{
   const d=copy(fixture);d.date="2026-02-30";
   assert.ok(codes(report(d)).includes("SCHEMA_FORMAT"));
