@@ -177,7 +177,10 @@ export async function inspectPdf(bytesInput){
        "PDF cannot be inspected safely; it may be damaged, unsupported or password protected.")
    ],{});
  }finally{
-   if(document)await document.destroy().catch(()=>{});
-   else if(task)await task.destroy().catch(()=>{});
+   // PDFDocumentLoadingTask.destroy() is the supported worker teardown API.
+   // Do not assume a destroy() method exists on the PDFDocumentProxy in every build.
+   if(task && typeof task.destroy==="function"){
+     try {await task.destroy();}catch(_){}
+   }
  }
 }
