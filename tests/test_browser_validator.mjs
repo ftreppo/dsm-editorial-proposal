@@ -89,6 +89,14 @@ test("sensitive field text is never included in findings",()=>{
   const d=copy(fixture);d.sections[0].texts.de="PRIVATE_SENTINEL_78945";
   assert.doesNotMatch(JSON.stringify(report(d)),/PRIVATE_SENTINEL/);
 });
+test("arbitrary object keys never leak through finding paths",()=>{
+  const d=copy(fixture);d.profile="ASSESSMENT";d.use_case="ASSESSMENT";
+  d.assessment={restrictions:[],assessed_competences_per_task:{PRIVATE_STUDENT_NAME_484:7}};
+  const r=report(d);
+  assert.ok(codes(r).includes("SCHEMA_TYPE"));
+  assert.doesNotMatch(JSON.stringify(r),/PRIVATE_STUDENT_NAME_484/);
+  assert.ok(r.findings.some(f=>f.path.includes("*")));
+});
 test("unknown future schema rule fails closed",()=>{
   const extra=copy(schema);extra.properties.title.pattern="^ABC";
   assert.throws(()=>checkSchemaSupport(extra),/Unsupported JSON Schema keyword/);
