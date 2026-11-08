@@ -2,6 +2,38 @@
 **Status:** V1 prototype, independent community proposal; not official Deutsche Schule Mailand policy.  
 **Initiated by Franco Treppo · 8.11.2026**
 
+## V2 — offline PDF, DOCX and HTML preflight (not full conformity)
+
+**Status:** available as an opt-in **local command-line tool**, not as a public browser uploader. The GitHub Pages interface continues to accept only structured JSON.
+
+Install on an authorized local workstation using Python 3.11+:
+
+```sh
+python -m pip install -r requirements-validator-v2.txt
+python -m validator.file_cli "sample.pdf"
+python -m validator.file_cli "sample.docx" --json
+python -m validator.file_cli "sample.html" --strict-review
+python -m unittest discover -s tests -p 'test_preflight_v2.py' -v
+```
+
+The output contains **only** a file hash, non-identifying counts and generic findings, never body text, names, file paths, filenames, hyperlinks or copies of school material. Input files are processed locally, with no network requests by the validator. Parsed documents are not changed.
+
+| Format | Deterministic V2 preflight |
+|---|---|
+| PDF | Pages (limit 50), proposed A4 portrait geometry, text extractability, very small text and embedded-file metadata. Does not render images or prove PDF/UA. |
+| DOCX | ZIP safety limits, section size and declared margins, detectable body text and top-level heading heuristic. Does not calculate actual pagination or visual layout. |
+| HTML/HTM | UTF-8 parse, root language, main landmark, H1 count and missing image-alt attributes. Does **not** run scripts or certify WCAG. |
+
+**Result:** V2 returns `REVIEW` even when all its narrow checks are satisfied: manual visual/accessibility review remains required. Damaged, encrypted, oversized or unsafe containers return `FAIL` (or an `INPUT_ERROR` for invalid invocation). There is no document-upload service.
+
+**Safety boundaries:** max input 12 MiB; PDFs max 50 pages; DOCX ZIP count, member, uncompressed size, compression-ratio and traversal safeguards. These limits reduce but do not eliminate parser vulnerabilities; do not use an unmaintained parser build on untrusted documents. No OCR or macros executed.
+
+**Comparison with V1:** V1 is a structured JSON editorial-rule validator; V2 examines real-file technical properties. A PDF/DOCX `REVIEW` cannot be combined with V1 `PASS` into an automatic institutional or LRS certification.
+
+**Not yet implemented:** full PDF/UA/WCAG auditing, visual page-image comparison, a rights-cleared official branding package, bilingual translation fidelity, LRS PolicyPack and authorized academic review, or a browser-only PDF/DOCX processor.
+
+---
+
 ## What is implemented
 - Python command-line JSON Schema 2020-12 validation using `jsonschema`, plus deterministic cross-field checks for language declaration, translations, full-width answers, points, duplicate sections and assessment competence metadata.
 - IT / DE / EN browser-only tool at [docs/validate.html](../docs/validate.html), with a local JSON file picker and a downloadable JSON report. No file is uploaded: processing is in the user's browser. The browser downloads **only** the public JSON schema from the same GitHub Pages origin.
@@ -56,7 +88,7 @@ For secure evaluation of real pupil material, use only an **authorized local dev
 - No automatic format conversion, PDF generation, editing or publication.
 
 ## Next steps
-1. V2: local HTML/DOCX/PDF geometry and accessibility extractors; tests with synthetic documents.
+1. V2b: explicit rendered-page visual QA and richer accessibility diagnostics, still offline.
 2. V3: separate LRS Adapter integration with explicit authorization/competence gates and human review.
 3. V4: validated, signed releases with immutable version identifiers and controlled permissions.
 
