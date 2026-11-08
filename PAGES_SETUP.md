@@ -2,14 +2,14 @@
 **Public community proposal, not an official DSM web property.**
 
 ## Files
-The site is a self-contained, accessible, client-side landing page at \`docs/index.html\`. It has **no analytics, third-party scripts, API, upload or server-side validation**.
+The site is a self-contained, accessible, client-side landing page at `docs/index.html`. It has **no analytics, third-party scripts, API, upload or server-side validation**.
 
 ## Publishing (maintainer action)
-1. Review and merge the landing-page PR into \`main\`.
+1. Review and merge the landing-page PR into `main`.
 2. Open **Repository → Settings → Pages** in GitHub (use the browser interface if the mobile app does not show repository settings).
 3. In **Build and deployment → Source**, choose **Deploy from a branch**.
 4. Under Branch select **main**, Folder select **/docs**, and **Save**.
-5. Wait for the Pages deployment to complete in GitHub Actions; verify the **URL shown in Settings → Pages** by opening it. Expected conventional URL: \`https://ftreppo.github.io/dsm-editorial-proposal/\`, but **do not label it live until the deployment is confirmed**.
+5. Wait for the Pages deployment to complete in GitHub Actions; verify the **URL shown in Settings → Pages** by opening it. Expected conventional URL: `https://ftreppo.github.io/dsm-editorial-proposal/`, but **do not label it live until the deployment is confirmed**.
 6. Test IT/DE/EN switch, copy button, repo links, mobile layout and text-only fallback.
 
 ## Status boundaries
