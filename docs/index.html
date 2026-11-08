@@ -95,6 +95,7 @@ footer .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:
    <div class="actions">
      <a class="button" href="#prompt-section" data-i18n="ctaPrompt">Usa il prompt</a>
      <a class="button secondary" href="https://github.com/ftreppo/dsm-editorial-proposal" target="_blank" rel="noopener" data-i18n="ctaRepo">Esplora lo standard</a>
+     <a class="button secondary" id="validateLink" href="./validate.html?lang=it" data-i18n="ctaValidate">Verifica JSON (locale)</a>
    </div>
    <p class="statusline" data-i18n="disclaimer">Community proposal: non è uno standard ufficiale né approvato dalla Deutsche Schule Mailand. Il marchio della scuola non è utilizzato.</p>
  </section>
@@ -181,7 +182,7 @@ it:{
 navGuide:"Come funziona",navPrompt:"Prompt",navContribute:"Collabora",eyebrow:"Proposta indipendente · v0.1",
 headline:"Documenti scolastici coerenti, bilingui e accessibili.",
 intro:"Una proposta aperta per dare ai materiali didattici e alle comunicazioni una struttura riconoscibile. Lo standard è su GitHub: chiunque può leggerlo e proporre miglioramenti.",
-ctaPrompt:"Usa il prompt",ctaRepo:"Esplora lo standard",
+ctaPrompt:"Usa il prompt",ctaRepo:"Esplora lo standard",ctaValidate:"Verifica JSON (locale)",
 disclaimer:"Community proposal: non è uno standard ufficiale né approvato dalla Deutsche Schule Mailand. Il marchio della scuola non è utilizzato.",
 sectionOne:"01 · Guida rapida",howTitle:"Come usarlo con ChatGPT o un altro modello",howLead:"Non serve installare nulla per usare il prompt. Il modello deve però poter leggere le regole su GitHub, oppure riceverle in chat.",
 step1Title:"Prepara il materiale",step1Body:"Apri il tuo documento e verifica che non contenga informazioni riservate che non sei autorizzato a condividere con il servizio AI scelto.",
@@ -194,10 +195,10 @@ sectionThree:"03 · Documenti",formatsTitle:"Un profilo per ogni destinatario",f
 parentType:"Genitori",parentTitle:"Comunicazioni compatte",parentDesc:"Blocchi DE/IT, oppure lingua scelta, con date, azioni e riferimenti ben visibili.",
 studentType:"Studenti",studentTitle:"Esercizi leggibili",studentDesc:"Colonne affiancate quando utili e autorizzate, con una sola area risposta a tutta larghezza.",
 assessmentType:"Verifiche",assessmentTitle:"Competenza preservata",assessmentDesc:"Traduzioni e misure LRS soltanto se compatibili con la competenza valutata e con le autorizzazioni.",
-sectionFour:"04 · Stato del progetto",statusTitle:"Cosa è disponibile, cosa manca",available:"Disponibile",review:"In revisione",planned:"In progetto",separate:"Separato",
+sectionFour:"04 · Stato del progetto",statusTitle:"Cosa è disponibile, cosa manca",available:"Disponibile",review:"In revisione",planned:"Beta",separate:"Separato",
 ready1:"Regole editoriali e template",ready1Desc:"Versione comunitaria v0.1 pubblicata su GitHub.",
 ready2:"Identità visiva e carta intestata",ready2Desc:"Logo, colori e font istituzionali non sono ancora certificati o autorizzati.",
-ready3:"Validatore automatico",ready3Desc:"Il rapporto PASS/REVIEW/FAIL non è ancora disponibile come servizio online.",
+ready3:"Validatore automatico",ready3Desc:"Verifica strutturale JSON locale disponibile in beta. PDF, Word, LRS e conformità grafica restano da sviluppare.",
 ready4:"LRS Adapter",ready4Desc:"L'accessibilità e le misure individuali seguono un contratto distinto; la pagina non esegue tali verifiche.",
 privacyTitle:"Privacy.",privacyBody:"Questa pagina non riceve documenti, non contiene un modulo di upload e non trasmette testi a modelli AI. Non pubblicare su GitHub compiti riservati o dati degli studenti.",
 sectionFive:"05 · Open collaboration",collabTitle:"Contribuisci allo standard",
@@ -211,7 +212,7 @@ de:{
 navGuide:"So funktioniert's",navPrompt:"Prompt",navContribute:"Mitmachen",eyebrow:"Unabhängiger Vorschlag · v0.1",
 headline:"Einheitliche, zweisprachige und zugängliche Schulunterlagen.",
 intro:"Ein offener Vorschlag für eine klare Struktur von Unterrichtsmaterialien und Mitteilungen. Die Regeln stehen auf GitHub und können gemeinsam verbessert werden.",
-ctaPrompt:"Prompt verwenden",ctaRepo:"Standard ansehen",
+ctaPrompt:"Prompt verwenden",ctaRepo:"Standard ansehen",ctaValidate:"JSON lokal prüfen",
 disclaimer:"Community-Vorschlag: kein offizieller und kein von der Deutschen Schule Mailand genehmigter Standard. Das Schullogo wird nicht verwendet.",
 sectionOne:"01 · Kurzanleitung",howTitle:"Mit ChatGPT oder einem anderen Modell arbeiten",howLead:"Keine Installation nötig. Das Modell muss die Regeln auf GitHub lesen können oder du musst sie im Chat bereitstellen.",
 step1Title:"Dokument vorbereiten",step1Body:"Prüfe vor dem Teilen, ob dein Dokument vertrauliche Informationen enthält, die du nicht an den gewählten KI-Dienst übermitteln darfst.",
@@ -224,10 +225,10 @@ sectionThree:"03 · Dokumenttypen",formatsTitle:"Ein Profil für jede Zielgruppe
 parentType:"Eltern",parentTitle:"Kompakte Mitteilungen",parentDesc:"DE/IT-Abschnitte oder eine gewählte Sprache mit gut sichtbaren Terminen und Handlungsaufforderungen.",
 studentType:"Schülerinnen und Schüler",studentTitle:"Lesbare Aufgaben",studentDesc:"Bei Bedarf und mit Genehmigung parallele Sprachspalten und ein gemeinsames Antwortfeld über die volle Seitenbreite.",
 assessmentType:"Leistungsnachweise",assessmentTitle:"Geprüfte Kompetenz erhalten",assessmentDesc:"Übersetzungen und LRS-Maßnahmen nur, wenn sie zur geprüften Kompetenz und zu den genehmigten Bedingungen passen.",
-sectionFour:"04 · Projektstatus",statusTitle:"Verfügbar und noch offen",available:"Verfügbar",review:"In Prüfung",planned:"Geplant",separate:"Getrennt",
+sectionFour:"04 · Projektstatus",statusTitle:"Verfügbar und noch offen",available:"Verfügbar",review:"In Prüfung",planned:"Beta",separate:"Getrennt",
 ready1:"Redaktionelle Regeln und Vorlagen",ready1Desc:"Community-Version v0.1 auf GitHub.",
 ready2:"Visuelle Identität und Briefkopf",ready2Desc:"Logo, Farben und Schriftarten sind nicht amtlich bestätigt oder freigegeben.",
-ready3:"Automatischer Validator",ready3Desc:"Ein Online-Dienst für PASS/REVIEW/FAIL ist noch nicht verfügbar.",
+ready3:"Automatischer Validator",ready3Desc:"Lokale JSON-Strukturprüfung als Beta verfügbar. PDF, Word, LRS und Layoutprüfung folgen später.",
 ready4:"LRS Adapter",ready4Desc:"LRS-Unterstützung und individuelle Maßnahmen folgen einem eigenen Regelwerk; diese Seite prüft sie nicht.",
 privacyTitle:"Datenschutz.",privacyBody:"Diese Seite nimmt keine Dateien an, hat keinen Upload und sendet keine Texte an KI-Modelle. Keine vertraulichen Prüfungen oder Schülerdaten auf GitHub veröffentlichen.",
 sectionFive:"05 · Mitarbeit",collabTitle:"Am Standard mitarbeiten",collabLead:"Programmierkenntnisse sind nicht erforderlich: Diskutiere zweisprachige Vorlagen, melde Barrieren oder schlage sprachliche Korrekturen auf GitHub vor.",
@@ -240,7 +241,7 @@ en:{
 navGuide:"How it works",navPrompt:"Prompt",navContribute:"Contribute",eyebrow:"Independent community proposal · v0.1",
 headline:"Consistent, bilingual and accessible school documents.",
 intro:"An open proposal for clear, reusable structures in learning materials and school communications. The standard lives on GitHub and welcomes contributions.",
-ctaPrompt:"Use the prompt",ctaRepo:"Explore the standard",
+ctaPrompt:"Use the prompt",ctaRepo:"Explore the standard",ctaValidate:"Validate JSON locally",
 disclaimer:"Community proposal: not an official or school-approved Deutsche Schule Mailand standard. The school's logo is not used.",
 sectionOne:"01 · Quick start",howTitle:"Use it with ChatGPT or another model",howLead:"No installation is required. The model must be able to read the rules on GitHub, or you must provide the files in the chat.",
 step1Title:"Prepare your document",step1Body:"Check whether your file contains confidential information that you are not authorized to send to the selected AI service.",
@@ -253,10 +254,10 @@ sectionThree:"03 · Document types",formatsTitle:"A profile for each audience",f
 parentType:"Parents",parentTitle:"Compact notices",parentDesc:"Paired DE/IT sections or a chosen language, with clear dates, actions and references.",
 studentType:"Students",studentTitle:"Readable exercises",studentDesc:"Optional side-by-side language columns where authorized, and a single full-width answer area.",
 assessmentType:"Assessments",assessmentTitle:"Preserve assessed competence",assessmentDesc:"Translations and LRS adjustments only when consistent with the assessed competence and approved measures.",
-sectionFour:"04 · Project status",statusTitle:"Available and still in progress",available:"Available",review:"In review",planned:"Planned",separate:"Separate",
+sectionFour:"04 · Project status",statusTitle:"Available and still in progress",available:"Available",review:"In review",planned:"Beta",separate:"Separate",
 ready1:"Editorial rules and templates",ready1Desc:"Community version v0.1 on GitHub.",
 ready2:"Visual identity and letterhead",ready2Desc:"Institutional logo, colours and fonts are not yet approved or verified.",
-ready3:"Automated validator",ready3Desc:"No online PASS/REVIEW/FAIL validation service is available yet.",
+ready3:"Automated validator",ready3Desc:"Local JSON structural validation is available in beta. PDF, Word, LRS and visual checks are future work.",
 ready4:"LRS Adapter",ready4Desc:"Accessibility accommodations follow a separate contract; this page does not run that check.",
 privacyTitle:"Privacy.",privacyBody:"This page has no file upload and does not transmit documents to AI models. Never publish confidential exams or student data on GitHub.",
 sectionFive:"05 · Open collaboration",collabTitle:"Contribute to the standard",collabLead:"You do not need to code: discuss bilingual layouts, report accessibility issues, or suggest language edits on GitHub.",
@@ -272,6 +273,7 @@ if(!Object.prototype.hasOwnProperty.call(texts,lang))return;
 current=lang;document.documentElement.lang=lang;
 for(const node of document.querySelectorAll("[data-i18n]")){const key=node.getAttribute("data-i18n");if(texts[lang][key])node.textContent=texts[lang][key];}
 prompt.value=texts[lang].prompt;
+const validatorLink=document.getElementById("validateLink");if(validatorLink)validatorLink.href="./validate.html?lang="+encodeURIComponent(lang);
 for(const b of document.querySelectorAll("[data-lang]"))b.setAttribute("aria-pressed",String(b.getAttribute("data-lang")===lang));
 try{const url=new URL(location.href);url.searchParams.set("lang",lang);history.replaceState(null,"",url.toString());}catch(_){}
 }
