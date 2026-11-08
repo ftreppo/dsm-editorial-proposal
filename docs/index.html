@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="description" content="DSM Editorial Standard — proposta aperta, indipendente e non ufficiale per documenti scolastici bilingui e accessibili. Istruzioni, prompt e collaborazione su GitHub.">
+<title>DSM-ES · Editorial Standard — Community Proposal</title>
+<style>
+:root{--ink:#20272d;--muted:#58636d;--paper:#fbfaf7;--surface:#fff;--line:#d9dedf;--accent:#244b5f;--hover:#eef3f4;--focus:#a06317;--radius:12px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+a{color:var(--accent);text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+button{font:inherit;cursor:pointer}
+.site-header{border-bottom:1px solid var(--line);background:var(--surface)}
+.container{max-width:1040px;margin:0 auto;padding-left:24px;padding-right:24px}
+.header-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:17px;padding-bottom:17px}
+.brand{color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:12px;font-weight:700;font-size:1.02rem}
+.brand-symbol{width:38px;height:38px;border:1px solid var(--ink);border-radius:5px;display:grid;place-items:center;font-size:11px;letter-spacing:.06em}
+.nav{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.nav a{font-size:.9rem;text-decoration:none}
+.lang-controls{display:flex;gap:4px;border:1px solid var(--line);border-radius:9px;padding:3px}
+.lang-controls button{background:transparent;color:var(--ink);border:0;border-radius:5px;padding:5px 8px;font-size:.83rem;font-weight:650}
+.lang-controls button[aria-pressed="true"]{background:var(--accent);color:white}
+.hero{padding-top:72px;padding-bottom:58px}
+.eyebrow{font-size:.79rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--accent)}
+h1{font-size:clamp(2rem,5vw,3.45rem);line-height:1.11;letter-spacing:-.04em;font-weight:720;margin:14px 0 20px;max-width:830px}
+.intro{font-size:clamp(1rem,2vw,1.2rem);color:var(--muted);max-width:740px}
+.actions{display:flex;flex-wrap:wrap;gap:11px;margin:28px 0 20px}
+.button{border:1px solid var(--accent);border-radius:9px;background:var(--accent);color:white;text-decoration:none;padding:10px 17px;font-weight:650;display:inline-flex;align-items:center;justify-content:center;min-height:44px}
+.button.secondary{background:transparent;color:var(--accent)}
+.button:hover{background:#163b4e;color:#fff}
+.button.secondary:hover{background:var(--hover);color:var(--accent)}
+.statusline{font-size:.86rem;color:var(--muted);margin-top:18px}
+.section{border-top:1px solid var(--line);padding-top:46px;padding-bottom:45px}
+h2{font-size:clamp(1.55rem,3vw,2.05rem);line-height:1.24;letter-spacing:-.025em;margin:0 0 12px}
+.section-lede{color:var(--muted);max-width:730px;margin:0 0 24px}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;list-style:none;padding:0;margin:24px 0 0}
+.step,.tile{border:1px solid var(--line);background:var(--surface);padding:23px;border-radius:var(--radius)}
+.step-number{color:var(--accent);font-size:.85rem;font-weight:750;letter-spacing:.07em}
+h3{font-size:1.08rem;margin:12px 0 9px;line-height:1.35}
+.step p,.tile p{margin:0;font-size:.94rem;color:var(--muted)}
+.tilegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.prompt-box{border:1px solid var(--line);background:#f0f3f2;border-radius:var(--radius);padding:18px}
+#prompt{display:block;width:100%;min-height:230px;resize:vertical;border:0;background:transparent;color:var(--ink);font:15px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;padding:0}
+#prompt:focus-visible{outline:2px solid var(--focus);outline-offset:4px}
+.prompt-footer{border-top:1px solid #cad1d1;margin-top:12px;padding-top:14px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.prompt-footer small{color:var(--muted);flex:1}
+button.copy{border:1px solid var(--accent);background:var(--accent);color:white;padding:9px 14px;border-radius:7px;font-size:.91rem;font-weight:650;min-height:42px}
+button.copy:hover{background:#163b4e}
+.links{display:flex;gap:10px 20px;flex-wrap:wrap;margin:16px 0 0}
+.links a{font-size:.93rem}
+.notice{border-left:3px solid var(--accent);padding:10px 0 10px 17px;background:transparent;margin-top:22px;color:var(--muted);font-size:.94rem}
+.notice strong{color:var(--ink)}
+.statuslist{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.status-item{padding:15px 0;border-bottom:1px solid var(--line)}
+.status-item strong{display:block;font-size:.98rem}
+.status-item p{margin:3px 0 0;color:var(--muted);font-size:.91rem}
+.overline{font-weight:750;font-size:.73rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.87rem;color:var(--muted)}
+footer .container{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.skip-link{position:absolute;left:-9999px;top:0;background:white;padding:12px;z-index:10}
+.skip-link:focus{left:10px}
+@media(max-width:720px){.hero{padding-top:48px;padding-bottom:38px}.steps,.tilegrid,.statuslist{grid-template-columns:1fr}.nav{gap:9px}.container{padding-left:18px;padding-right:18px}.step,.tile{padding:18px}.section{padding-top:34px;padding-bottom:34px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{body{background:white}.nav,.actions,.prompt-footer button{display:none!important}.section{break-inside:avoid}a{color:inherit}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+ <div class="container header-inner">
+  <a href="#top" class="brand"><span class="brand-symbol" aria-hidden="true">ES</span> DSM Editorial Standard</a>
+  <nav class="nav" aria-label="Site">
+   <a href="#guide" data-i18n="navGuide">Come funziona</a>
+   <a href="#prompt-section" data-i18n="navPrompt">Prompt</a>
+   <a href="#collaboration" data-i18n="navContribute">Collabora</a>
+  </nav>
+  <div class="lang-controls" role="group" aria-label="Language / Sprache / Lingua">
+    <button type="button" data-lang="it" aria-pressed="true">IT</button>
+    <button type="button" data-lang="de" aria-pressed="false">DE</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+  </div>
+ </div>
+</header>
+<main id="main">
+ <section class="container hero" id="top">
+   <div class="eyebrow" data-i18n="eyebrow">Proposta indipendente · v0.1</div>
+   <h1 data-i18n="headline">Documenti scolastici coerenti, bilingui e accessibili.</h1>
+   <p class="intro" data-i18n="intro">Una proposta aperta per dare ai materiali didattici e alle comunicazioni una struttura riconoscibile. Lo standard è su GitHub: chiunque può leggerlo e proporre miglioramenti.</p>
+   <div class="actions">
+     <a class="button" href="#prompt-section" data-i18n="ctaPrompt">Usa il prompt</a>
+     <a class="button secondary" href="https://github.com/ftreppo/dsm-editorial-proposal" target="_blank" rel="noopener" data-i18n="ctaRepo">Esplora lo standard</a>
+   </div>
+   <p class="statusline" data-i18n="disclaimer">Community proposal: non è uno standard ufficiale né approvato dalla Deutsche Schule Mailand. Il marchio della scuola non è utilizzato.</p>
+ </section>
+ <section class="section" id="guide">
+  <div class="container">
+   <div class="eyebrow" data-i18n="sectionOne">01 · Guida rapida</div>
+   <h2 data-i18n="howTitle">Come usarlo con ChatGPT o un altro modello</h2>
+   <p class="section-lede" data-i18n="howLead">Non serve installare nulla per usare il prompt. Il modello deve però poter leggere le regole su GitHub, oppure riceverle in chat.</p>
+   <ol class="steps">
+    <li class="step"><span class="step-number">01</span><h3 data-i18n="step1Title">Prepara il materiale</h3><p data-i18n="step1Body">Apri il tuo documento e verifica che non contenga informazioni riservate che non sei autorizzato a condividere con il servizio AI scelto.</p></li>
+    <li class="step"><span class="step-number">02</span><h3 data-i18n="step2Title">Incolla il prompt</h3><p data-i18n="step2Body">Copia le istruzioni qui sotto nella chat e allega il documento. Specifica se è una comunicazione, un esercizio o una verifica.</p></li>
+    <li class="step"><span class="step-number">03</span><h3 data-i18n="step3Title">Rivedi il risultato</h3><p data-i18n="step3Body">Controlla fedeltà, traduzioni e impaginazione. Una verifica LRS o una certificazione automatica è valida solo se gli strumenti previsti sono stati realmente eseguiti.</p></li>
+   </ol>
+  </div>
+ </section>
+ <section class="section" id="prompt-section">
+  <div class="container">
+   <div class="eyebrow" data-i18n="sectionTwo">02 · Inizia subito</div>
+   <h2 data-i18n="promptTitle">Prompt pronto da copiare</h2>
+   <p class="section-lede" data-i18n="promptLead">Puoi usarlo con ChatGPT, Gemini o un altro assistente che possa leggere il repository. Il contenuto del documento resta sotto la responsabilità di chi lo pubblica.</p>
+   <div class="prompt-box">
+    <label for="prompt" class="overline" data-i18n="promptLabel">Istruzione per il modello</label>
+    <textarea id="prompt" readonly aria-label="Prompt DSM Editorial Standard">Applica lo standard DSM-ES v0.1 (proposta indipendente) al documento che allego. Leggi README.md, standard/DSM-ES-v0.1.md e prompts/teacher-creator.md da https://github.com/ftreppo/dsm-editorial-proposal. Se non puoi consultarli, dimmelo e chiedimi di fornire i file: non inventare regole. Mantieni significato, istruzioni, numerazione e punteggi; separa lingua originale, eventuale lingua di supporto e lingua ammessa per le risposte. Non applicare misure LRS senza autorizzazione e non dichiarare PASS senza aver eseguito il relativo controllo. Non usare logo e colori istituzionali non autorizzati. Consegna la versione riformattata, un registro delle modifiche e le verifiche ancora necessarie.</textarea>
+    <div class="prompt-footer">
+      <small data-i18n="copyTip">Il pulsante copia solo il testo: non carica documenti.</small>
+      <button type="button" id="copyPrompt" class="copy" data-i18n="copy">Copia il prompt</button>
+    </div>
+   </div>
+   <div class="links">
+    <a href="https://github.com/ftreppo/dsm-editorial-proposal/blob/main/standard/DSM-ES-v0.1.md" target="_blank" rel="noopener" data-i18n="linkStandard">Standard v0.1</a>
+    <a href="https://github.com/ftreppo/dsm-editorial-proposal/blob/main/prompts/teacher-creator.md" target="_blank" rel="noopener" data-i18n="linkTeacher">Prompt per insegnanti</a>
+    <a href="https://github.com/ftreppo/dsm-editorial-proposal/blob/main/templates/student-worksheet.md" target="_blank" rel="noopener" data-i18n="linkWorksheet">Template esercizi</a>
+   </div>
+  </div>
+ </section>
+ <section class="section" id="formats">
+  <div class="container">
+   <div class="eyebrow" data-i18n="sectionThree">03 · Documenti</div>
+   <h2 data-i18n="formatsTitle">Un profilo per ogni destinatario</h2>
+   <p class="section-lede" data-i18n="formatsLead">La scelta del bilinguismo dipende dal destinatario e dall'obiettivo didattico, non dall'impaginazione.</p>
+   <div class="tilegrid">
+    <article class="tile"><span class="overline" data-i18n="parentType">Genitori</span><h3 data-i18n="parentTitle">Comunicazioni compatte</h3><p data-i18n="parentDesc">Blocchi DE/IT, oppure lingua scelta, con date, azioni e riferimenti ben visibili.</p></article>
+    <article class="tile"><span class="overline" data-i18n="studentType">Studenti</span><h3 data-i18n="studentTitle">Esercizi leggibili</h3><p data-i18n="studentDesc">Colonne affiancate quando utili e autorizzate, con una sola area risposta a tutta larghezza.</p></article>
+    <article class="tile"><span class="overline" data-i18n="assessmentType">Verifiche</span><h3 data-i18n="assessmentTitle">Competenza preservata</h3><p data-i18n="assessmentDesc">Traduzioni e misure LRS soltanto se compatibili con la competenza valutata e con le autorizzazioni.</p></article>
+   </div>
+  </div>
+ </section>
+ <section class="section" id="status">
+  <div class="container">
+   <div class="eyebrow" data-i18n="sectionFour">04 · Stato del progetto</div>
+   <h2 data-i18n="statusTitle">Cosa è disponibile, cosa manca</h2>
+   <div class="statuslist">
+     <div class="status-item"><span class="overline" data-i18n="available">Disponibile</span><strong data-i18n="ready1">Regole editoriali e template</strong><p data-i18n="ready1Desc">Versione comunitaria v0.1 pubblicata su GitHub.</p></div>
+     <div class="status-item"><span class="overline" data-i18n="review">In revisione</span><strong data-i18n="ready2">Identità visiva e carta intestata</strong><p data-i18n="ready2Desc">Logo, colori e font istituzionali non sono ancora certificati o autorizzati.</p></div>
+     <div class="status-item"><span class="overline" data-i18n="planned">In progetto</span><strong data-i18n="ready3">Validatore automatico</strong><p data-i18n="ready3Desc">Il rapporto PASS/REVIEW/FAIL non è ancora disponibile come servizio online.</p></div>
+     <div class="status-item"><span class="overline" data-i18n="separate">Separato</span><strong data-i18n="ready4">LRS Adapter</strong><p data-i18n="ready4Desc">L'accessibilità e le misure individuali seguono un contratto distinto; la pagina non esegue tali verifiche.</p></div>
+   </div>
+   <p class="notice"><strong data-i18n="privacyTitle">Privacy.</strong> <span data-i18n="privacyBody">Questa pagina non riceve documenti, non contiene un modulo di upload e non trasmette testi a modelli AI. Non pubblicare su GitHub compiti riservati o dati degli studenti.</span></p>
+  </div>
+ </section>
+ <section class="section" id="collaboration">
+  <div class="container">
+   <div class="eyebrow" data-i18n="sectionFive">05 · Open collaboration</div>
+   <h2 data-i18n="collabTitle">Contribuisci allo standard</h2>
+   <p class="section-lede" data-i18n="collabLead">Non serve programmare per partecipare: puoi discutere un modello bilingue, segnalare un problema di accessibilità oppure proporre una correzione linguistica su GitHub.</p>
+   <div class="actions">
+     <a class="button" href="https://github.com/ftreppo/dsm-editorial-proposal/issues" target="_blank" rel="noopener" data-i18n="openIssues">Apri le discussioni (Issues)</a>
+     <a class="button secondary" href="https://github.com/ftreppo/dsm-editorial-proposal/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener" data-i18n="contributionGuide">Guida ai contributi</a>
+   </div>
+   <div class="links">
+     <a href="https://github.com/ftreppo/dsm-editorial-proposal/issues/1" target="_blank" rel="noopener" data-i18n="issueBilingual">Bilinguismo</a>
+     <a href="https://github.com/ftreppo/dsm-editorial-proposal/issues/2" target="_blank" rel="noopener" data-i18n="issueLrs">Accessibilità / LRS</a>
+     <a href="https://github.com/ftreppo/dsm-editorial-proposal/issues/4" target="_blank" rel="noopener" data-i18n="issueVisual">Identità visiva</a>
+   </div>
+  </div>
+ </section>
+</main>
+<footer><div class="container"><span>DSM Editorial Standard · Community Proposal v0.1</span><span data-i18n="footer">Proposta di Franco Treppo · 8.11.2026 · Non ufficiale DSM</span></div></footer>
+<script>
+(function(){
+"use strict";
+const texts={
+it:{
+navGuide:"Come funziona",navPrompt:"Prompt",navContribute:"Collabora",eyebrow:"Proposta indipendente · v0.1",
+headline:"Documenti scolastici coerenti, bilingui e accessibili.",
+intro:"Una proposta aperta per dare ai materiali didattici e alle comunicazioni una struttura riconoscibile. Lo standard è su GitHub: chiunque può leggerlo e proporre miglioramenti.",
+ctaPrompt:"Usa il prompt",ctaRepo:"Esplora lo standard",
+disclaimer:"Community proposal: non è uno standard ufficiale né approvato dalla Deutsche Schule Mailand. Il marchio della scuola non è utilizzato.",
+sectionOne:"01 · Guida rapida",howTitle:"Come usarlo con ChatGPT o un altro modello",howLead:"Non serve installare nulla per usare il prompt. Il modello deve però poter leggere le regole su GitHub, oppure riceverle in chat.",
+step1Title:"Prepara il materiale",step1Body:"Apri il tuo documento e verifica che non contenga informazioni riservate che non sei autorizzato a condividere con il servizio AI scelto.",
+step2Title:"Incolla il prompt",step2Body:"Copia le istruzioni qui sotto nella chat e allega il documento. Specifica se è una comunicazione, un esercizio o una verifica.",
+step3Title:"Rivedi il risultato",step3Body:"Controlla fedeltà, traduzioni e impaginazione. Una verifica LRS o una certificazione automatica è valida solo se gli strumenti previsti sono stati realmente eseguiti.",
+sectionTwo:"02 · Inizia subito",promptTitle:"Prompt pronto da copiare",promptLead:"Puoi usarlo con ChatGPT, Gemini o un altro assistente che possa leggere il repository. Il contenuto del documento resta sotto la responsabilità di chi lo pubblica.",
+promptLabel:"Istruzione per il modello",copyTip:"Il pulsante copia solo il testo: non carica documenti.",copy:"Copia il prompt",copied:"Copiato",copyFallback:"Seleziona e copia il testo",
+linkStandard:"Standard v0.1",linkTeacher:"Prompt per insegnanti",linkWorksheet:"Template esercizi",
+sectionThree:"03 · Documenti",formatsTitle:"Un profilo per ogni destinatario",formatsLead:"La scelta del bilinguismo dipende dal destinatario e dall'obiettivo didattico, non dall'impaginazione.",
+parentType:"Genitori",parentTitle:"Comunicazioni compatte",parentDesc:"Blocchi DE/IT, oppure lingua scelta, con date, azioni e riferimenti ben visibili.",
+studentType:"Studenti",studentTitle:"Esercizi leggibili",studentDesc:"Colonne affiancate quando utili e autorizzate, con una sola area risposta a tutta larghezza.",
+assessmentType:"Verifiche",assessmentTitle:"Competenza preservata",assessmentDesc:"Traduzioni e misure LRS soltanto se compatibili con la competenza valutata e con le autorizzazioni.",
+sectionFour:"04 · Stato del progetto",statusTitle:"Cosa è disponibile, cosa manca",available:"Disponibile",review:"In revisione",planned:"In progetto",separate:"Separato",
+ready1:"Regole editoriali e template",ready1Desc:"Versione comunitaria v0.1 pubblicata su GitHub.",
+ready2:"Identità visiva e carta intestata",ready2Desc:"Logo, colori e font istituzionali non sono ancora certificati o autorizzati.",
+ready3:"Validatore automatico",ready3Desc:"Il rapporto PASS/REVIEW/FAIL non è ancora disponibile come servizio online.",
+ready4:"LRS Adapter",ready4Desc:"L'accessibilità e le misure individuali seguono un contratto distinto; la pagina non esegue tali verifiche.",
+privacyTitle:"Privacy.",privacyBody:"Questa pagina non riceve documenti, non contiene un modulo di upload e non trasmette testi a modelli AI. Non pubblicare su GitHub compiti riservati o dati degli studenti.",
+sectionFive:"05 · Open collaboration",collabTitle:"Contribuisci allo standard",
+collabLead:"Non serve programmare per partecipare: puoi discutere un modello bilingue, segnalare un problema di accessibilità oppure proporre una correzione linguistica su GitHub.",
+openIssues:"Apri le discussioni (Issues)",contributionGuide:"Guida ai contributi",
+issueBilingual:"Bilinguismo",issueLrs:"Accessibilità / LRS",issueVisual:"Identità visiva",
+footer:"Proposta di Franco Treppo · 8.11.2026 · Non ufficiale DSM",
+prompt:"Applica lo standard DSM-ES v0.1 (proposta indipendente) al documento che allego. Leggi README.md, standard/DSM-ES-v0.1.md e prompts/teacher-creator.md da https://github.com/ftreppo/dsm-editorial-proposal. Se non puoi consultarli, dimmelo e chiedimi di fornire i file: non inventare regole. Mantieni significato, istruzioni, numerazione e punteggi; separa lingua originale, eventuale lingua di supporto e lingua ammessa per le risposte. Non applicare misure LRS senza autorizzazione e non dichiarare PASS senza aver eseguito il relativo controllo. Non usare logo e colori istituzionali non autorizzati. Consegna la versione riformattata, un registro delle modifiche e le verifiche ancora necessarie."
+},
+de:{
+navGuide:"So funktioniert's",navPrompt:"Prompt",navContribute:"Mitmachen",eyebrow:"Unabhängiger Vorschlag · v0.1",
+headline:"Einheitliche, zweisprachige und zugängliche Schulunterlagen.",
+intro:"Ein offener Vorschlag für eine klare Struktur von Unterrichtsmaterialien und Mitteilungen. Die Regeln stehen auf GitHub und können gemeinsam verbessert werden.",
+ctaPrompt:"Prompt verwenden",ctaRepo:"Standard ansehen",
+disclaimer:"Community-Vorschlag: kein offizieller und kein von der Deutschen Schule Mailand genehmigter Standard. Das Schullogo wird nicht verwendet.",
+sectionOne:"01 · Kurzanleitung",howTitle:"Mit ChatGPT oder einem anderen Modell arbeiten",howLead:"Keine Installation nötig. Das Modell muss die Regeln auf GitHub lesen können oder du musst sie im Chat bereitstellen.",
+step1Title:"Dokument vorbereiten",step1Body:"Prüfe vor dem Teilen, ob dein Dokument vertrauliche Informationen enthält, die du nicht an den gewählten KI-Dienst übermitteln darfst.",
+step2Title:"Prompt einfügen",step2Body:"Kopiere die Anweisung in deinen Chat und füge das Dokument hinzu. Gib an, ob es eine Mitteilung, Übung oder Prüfung ist.",
+step3Title:"Ergebnis prüfen",step3Body:"Kontrolliere Inhaltstreue, Übersetzungen und Layout. Eine LRS- oder automatische Konformitätsprüfung gilt nur, wenn die entsprechenden Werkzeuge tatsächlich ausgeführt wurden.",
+sectionTwo:"02 · Direkt starten",promptTitle:"Prompt zum Kopieren",promptLead:"Für ChatGPT, Gemini oder andere Assistenten mit Zugriff auf das Repository. Die Verantwortung für veröffentlichte Inhalte bleibt bei der herausgebenden Person.",
+promptLabel:"Anweisung an das Modell",copyTip:"Der Button kopiert nur Text; er lädt keine Dateien hoch.",copy:"Prompt kopieren",copied:"Kopiert",copyFallback:"Text markieren und kopieren",
+linkStandard:"Standard v0.1",linkTeacher:"Prompt für Lehrkräfte",linkWorksheet:"Aufgabenblatt-Vorlage",
+sectionThree:"03 · Dokumenttypen",formatsTitle:"Ein Profil für jede Zielgruppe",formatsLead:"Zweisprachigkeit richtet sich nach Lernziel und Zielgruppe, nicht nach einem starren Layout.",
+parentType:"Eltern",parentTitle:"Kompakte Mitteilungen",parentDesc:"DE/IT-Abschnitte oder eine gewählte Sprache mit gut sichtbaren Terminen und Handlungsaufforderungen.",
+studentType:"Schülerinnen und Schüler",studentTitle:"Lesbare Aufgaben",studentDesc:"Bei Bedarf und mit Genehmigung parallele Sprachspalten und ein gemeinsames Antwortfeld über die volle Seitenbreite.",
+assessmentType:"Leistungsnachweise",assessmentTitle:"Geprüfte Kompetenz erhalten",assessmentDesc:"Übersetzungen und LRS-Maßnahmen nur, wenn sie zur geprüften Kompetenz und zu den genehmigten Bedingungen passen.",
+sectionFour:"04 · Projektstatus",statusTitle:"Verfügbar und noch offen",available:"Verfügbar",review:"In Prüfung",planned:"Geplant",separate:"Getrennt",
+ready1:"Redaktionelle Regeln und Vorlagen",ready1Desc:"Community-Version v0.1 auf GitHub.",
+ready2:"Visuelle Identität und Briefkopf",ready2Desc:"Logo, Farben und Schriftarten sind nicht amtlich bestätigt oder freigegeben.",
+ready3:"Automatischer Validator",ready3Desc:"Ein Online-Dienst für PASS/REVIEW/FAIL ist noch nicht verfügbar.",
+ready4:"LRS Adapter",ready4Desc:"LRS-Unterstützung und individuelle Maßnahmen folgen einem eigenen Regelwerk; diese Seite prüft sie nicht.",
+privacyTitle:"Datenschutz.",privacyBody:"Diese Seite nimmt keine Dateien an, hat keinen Upload und sendet keine Texte an KI-Modelle. Keine vertraulichen Prüfungen oder Schülerdaten auf GitHub veröffentlichen.",
+sectionFive:"05 · Mitarbeit",collabTitle:"Am Standard mitarbeiten",collabLead:"Programmierkenntnisse sind nicht erforderlich: Diskutiere zweisprachige Vorlagen, melde Barrieren oder schlage sprachliche Korrekturen auf GitHub vor.",
+openIssues:"Themen öffnen (Issues)",contributionGuide:"Beitragsleitfaden",
+issueBilingual:"Zweisprachigkeit",issueLrs:"Barrierefreiheit / LRS",issueVisual:"Visuelle Identität",
+footer:"Vorschlag von Franco Treppo · 8.11.2026 · Nicht offiziell DSM",
+prompt:"Wende den unabhängigen Community-Vorschlag DSM-ES v0.1 auf mein beigefügtes Dokument an. Lies README.md, standard/DSM-ES-v0.1.md und prompts/teacher-creator.md aus https://github.com/ftreppo/dsm-editorial-proposal. Falls du nicht darauf zugreifen kannst, sage es ausdrücklich und bitte mich um die Dateien; erfinde keine Regeln. Erhalte Inhalt, Anforderungen, Nummerierung und Punkte. Unterscheide Originalsprache, etwaige Hilfssprache und erlaubte Antwortsprache. Wende keine LRS-Maßnahmen ohne Genehmigung an und behaupte kein PASS ohne tatsächlich ausgeführte Prüfung. Nutze keine nicht genehmigten Logos oder Farben der Schule. Liefere das formatierte Dokument, ein Änderungsprotokoll und offene Prüfpunkte."
+},
+en:{
+navGuide:"How it works",navPrompt:"Prompt",navContribute:"Contribute",eyebrow:"Independent community proposal · v0.1",
+headline:"Consistent, bilingual and accessible school documents.",
+intro:"An open proposal for clear, reusable structures in learning materials and school communications. The standard lives on GitHub and welcomes contributions.",
+ctaPrompt:"Use the prompt",ctaRepo:"Explore the standard",
+disclaimer:"Community proposal: not an official or school-approved Deutsche Schule Mailand standard. The school's logo is not used.",
+sectionOne:"01 · Quick start",howTitle:"Use it with ChatGPT or another model",howLead:"No installation is required. The model must be able to read the rules on GitHub, or you must provide the files in the chat.",
+step1Title:"Prepare your document",step1Body:"Check whether your file contains confidential information that you are not authorized to send to the selected AI service.",
+step2Title:"Paste the prompt",step2Body:"Copy the instruction below into your chat, attach the document, and identify whether it is a notice, worksheet or assessment.",
+step3Title:"Review the result",step3Body:"Check fidelity, translations and layout. LRS or automated compliance checks are valid only if the appropriate tools have actually run.",
+sectionTwo:"02 · Get started",promptTitle:"Ready-to-copy prompt",promptLead:"For ChatGPT, Gemini or any assistant that can read the repository. The person publishing a document remains responsible for its content.",
+promptLabel:"Instruction for the model",copyTip:"The button copies text only; it does not upload files.",copy:"Copy prompt",copied:"Copied",copyFallback:"Select and copy the text",
+linkStandard:"Standard v0.1",linkTeacher:"Teacher prompt",linkWorksheet:"Worksheet template",
+sectionThree:"03 · Document types",formatsTitle:"A profile for each audience",formatsLead:"Bilingual support depends on the audience and learning objective, not on a rigid layout.",
+parentType:"Parents",parentTitle:"Compact notices",parentDesc:"Paired DE/IT sections or a chosen language, with clear dates, actions and references.",
+studentType:"Students",studentTitle:"Readable exercises",studentDesc:"Optional side-by-side language columns where authorized, and a single full-width answer area.",
+assessmentType:"Assessments",assessmentTitle:"Preserve assessed competence",assessmentDesc:"Translations and LRS adjustments only when consistent with the assessed competence and approved measures.",
+sectionFour:"04 · Project status",statusTitle:"Available and still in progress",available:"Available",review:"In review",planned:"Planned",separate:"Separate",
+ready1:"Editorial rules and templates",ready1Desc:"Community version v0.1 on GitHub.",
+ready2:"Visual identity and letterhead",ready2Desc:"Institutional logo, colours and fonts are not yet approved or verified.",
+ready3:"Automated validator",ready3Desc:"No online PASS/REVIEW/FAIL validation service is available yet.",
+ready4:"LRS Adapter",ready4Desc:"Accessibility accommodations follow a separate contract; this page does not run that check.",
+privacyTitle:"Privacy.",privacyBody:"This page has no file upload and does not transmit documents to AI models. Never publish confidential exams or student data on GitHub.",
+sectionFive:"05 · Open collaboration",collabTitle:"Contribute to the standard",collabLead:"You do not need to code: discuss bilingual layouts, report accessibility issues, or suggest language edits on GitHub.",
+openIssues:"Open discussions (Issues)",contributionGuide:"Contribution guide",
+issueBilingual:"Bilingual layout",issueLrs:"Accessibility / LRS",issueVisual:"Visual identity",
+footer:"Proposed by Franco Treppo · 8.11.2026 · Not official DSM",
+prompt:"Apply the independent community proposal DSM-ES v0.1 to my attached document. Read README.md, standard/DSM-ES-v0.1.md and prompts/teacher-creator.md from https://github.com/ftreppo/dsm-editorial-proposal. If you cannot access them, say so and ask me for the files; do not invent rules. Preserve meaning, instructions, numbering and scores. Distinguish original language, optional support language and permitted answer language. Do not apply LRS accommodations without authorization and do not claim PASS without actually running the relevant checks. Do not use unauthorized school logos or official colours. Return the formatted document, a change log and outstanding review items."
+}};
+const prompt=document.getElementById("prompt"),copy=document.getElementById("copyPrompt");
+let current="it";
+function setLang(lang){
+if(!Object.prototype.hasOwnProperty.call(texts,lang))return;
+current=lang;document.documentElement.lang=lang;
+for(const node of document.querySelectorAll("[data-i18n]")){const key=node.getAttribute("data-i18n");if(texts[lang][key])node.textContent=texts[lang][key];}
+prompt.value=texts[lang].prompt;
+for(const b of document.querySelectorAll("[data-lang]"))b.setAttribute("aria-pressed",String(b.getAttribute("data-lang")===lang));
+try{const url=new URL(location.href);url.searchParams.set("lang",lang);history.replaceState(null,"",url.toString());}catch(_){}
+}
+for(const b of document.querySelectorAll("[data-lang]"))b.addEventListener("click",function(){setLang(b.getAttribute("data-lang"));});
+copy.addEventListener("click",async function(){
+try{if(!navigator.clipboard || !window.isSecureContext)throw Error("clipboard unavailable");
+await navigator.clipboard.writeText(prompt.value);copy.textContent=texts[current].copied;
+}catch(_){prompt.focus();prompt.select();copy.textContent=texts[current].copyFallback;}
+window.setTimeout(function(){copy.textContent=texts[current].copy;},2200);
+});
+let queryLang=null;try{queryLang=new URLSearchParams(location.search).get("lang")}catch(_){}
+setLang(queryLang && texts[queryLang]?queryLang:"it");
+})();
+</script>
+</body>
+</html>
