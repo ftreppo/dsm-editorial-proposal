@@ -25,8 +25,22 @@ def issue(category: str, code: str, severity: str, path: str, message: str) -> d
             "path": path, "message": message}
 
 
+_SAFE_PATH_KEYS = frozenset((
+    "schema_version", "document_id", "version", "status", "profile",
+    "use_case", "title", "subject", "class_or_audience", "source_language",
+    "support_languages", "response_languages", "translation_status", "date",
+    "duration_minutes", "max_points", "source_reference", "distribution",
+    "approval", "editor_reviewed", "translation_reviewed", "assessor_approved",
+    "assessment", "restrictions", "assessed_competences_per_task",
+    "policy_pack_reference", "sections", "section_id", "kind", "texts",
+    "points", "answer_area", "de", "it", "en"
+))
+
+
 def _pointer(segments: Any) -> str:
-    parts = [str(p).replace("~", "~0").replace("/", "~1") for p in segments]
+    # Do not expose arbitrary user-supplied object keys in public test reports.
+    parts = [str(p if isinstance(p, int) or p in _SAFE_PATH_KEYS else "*")
+             .replace("~", "~0").replace("/", "~1") for p in segments]
     return "/" + "/".join(parts) if parts else "/"
 
 
