@@ -2,7 +2,7 @@
 **Public community proposal, not an official DSM web property.**
 
 ## Files
-The site is a self-contained, accessible, client-side landing page at `docs/index.html`. It has **no analytics, third-party scripts, API, upload or server-side validation**.
+The site includes a self-contained IT/DE/EN landing page at `docs/index.html` and an independent on-device structured JSON V1 validator at `docs/validate.html`. It has **no analytics, third-party scripts, upload endpoint, paid AI API or server-side validation**. The validator fetches only a public, same-origin static schema from `docs/specification/document.schema.json`; document contents and reports remain local.
 
 ## Publishing (maintainer action)
 1. Review and merge the landing-page PR into `main`.
