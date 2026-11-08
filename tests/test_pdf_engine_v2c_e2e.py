@@ -80,8 +80,9 @@ class PDFJsBrowserV2c(unittest.TestCase):
             "name":"SYNTHETIC-PDF.pdf","mimeType":"application/pdf","buffer":pdf_bytes
         })
         self.page.locator("#run").click()
-        self.page.wait_for_function("document.querySelector('#reportSection').classList.contains('visible') && !document.querySelector('#run').disabled")
-        with self.page.expect_download() as info:
+        self.page.wait_for_function("document.querySelector('#reportSection').classList.contains('visible') && !document.querySelector('#run').disabled", timeout=12000)
+        self.assertFalse(self.page.locator("#save").is_disabled(), "Report download unexpectedly disabled")
+        with self.page.expect_download(timeout=12000) as info:
             self.page.locator("#save").click()
         download=info.value
         with tempfile.TemporaryDirectory() as folder:
