@@ -18,7 +18,9 @@ The site includes a self-contained IT/DE/EN landing page at `docs/index.html` an
 - Logo, palette and typography in the visual-identity proposal are pending institutional verification. The landing intentionally uses a text-only independent community identity.
 - Do not publish actual pupils' data, diagnoses or unpublished school examinations.
 
-## When the validator exists
-Add a local-only, client-side validation interface if technically suitable, or link a downloadable CLI. Never silently send student material to GitHub Actions or to an external backend.
+## Validator V1
+After deployment test `/validate.html` from the main landing page: select the **synthetic JSON fixture**, confirm a `REVIEW` report for draft translation, and download a report. Test IT / DE / EN links. PDF and Word are explicitly unsupported and must not be submitted. The `validator/README.md` documents CLI usage and limitations.
+
+**Future:** extend support with local document parsers without silently sending student material to GitHub Actions or to an external backend.
 
 **Signed: Franco Treppo — 8.11.2026**
