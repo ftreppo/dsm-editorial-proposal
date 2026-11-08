@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1",
+  "document_id": "SYN-PHY-001",
+  "version": "0.1",
+  "status": "DRAFT",
+  "profile": "STUDENTS",
+  "use_case": "STUDY",
+  "title": "Lichtwege / Percorsi della luce — synthetic",
+  "subject": "Physik / Fisica",
+  "class_or_audience": "Synthetic example (no real pupils)",
+  "source_language": "de",
+  "support_languages": [
+    "it"
+  ],
+  "response_languages": [
+    "de"
+  ],
+  "translation_status": "DRAFT",
+  "distribution": "PUBLIC_SYNTHETIC",
+  "sections": [
+    {
+      "section_id": "ex01",
+      "kind": "EXERCISE",
+      "texts": {
+        "de": "Zeichne den Weg eines Lichtstrahls von einer Lampe zu einer Wand.",
+        "it": "Disegna il percorso di un raggio luminoso da una lampada a una parete."
+      },
+      "points": 2,
+      "answer_area": "FULL_WIDTH_DRAWING"
+    }
+  ]
+}
