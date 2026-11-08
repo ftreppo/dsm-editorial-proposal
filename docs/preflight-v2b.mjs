@@ -206,8 +206,13 @@ async function inspectDocx(bytes){
     xmlPart(bytes,zip,"word/document.xml"),
     xmlPart(bytes,zip,"[Content_Types].xml")
   ]);
-  if(!/<(?:[\w.-]+:)?Types(?:\s|>)/.test(content)||
-     !/<(?:[\w.-]+:)?document(?:\s|>)/.test(xml))
+  const root=(value,name)=>{
+    const trimmed=value.replace(/^\uFEFF/,"")
+      .replace(/^\s*<\?xml[^>]*\?>/i,"")
+      .replace(/^\s*(?:<!--[\s\S]*?-->\s*)*/,"").trimStart();
+    return new RegExp("^<(?:[\\w.-]+:)?"+name+"(?:\\s|>)").test(trimmed);
+  };
+  if(!root(content,"Types")||!root(xml,"document"))
     throw new Rejected("DOCX_XML_ROOT_INVALID");
   const out=hints(xml);
   if([...zip.entries.keys()].some(x=>x.startsWith("word/embeddings/")))
