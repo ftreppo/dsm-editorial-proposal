@@ -11,6 +11,9 @@ on:
       - 'tests/test_browser_validator.mjs'
       - 'docs/validate.html'
       - 'docs/validator-v1.mjs'
+      - 'docs/validator-ui.mjs'
+      - 'docs/preflight-v2b.mjs'
+      - 'tests/test_browser_preflight_v2b.mjs'
       - 'docs/specification/**'
       - '.github/workflows/validator-v1.yml'
   push:
@@ -24,6 +27,9 @@ on:
       - 'tests/test_browser_validator.mjs'
       - 'docs/validate.html'
       - 'docs/validator-v1.mjs'
+      - 'docs/validator-ui.mjs'
+      - 'docs/preflight-v2b.mjs'
+      - 'tests/test_browser_preflight_v2b.mjs'
       - 'docs/specification/**'
       - '.github/workflows/validator-v1.yml'
   workflow_dispatch:
@@ -58,4 +64,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run browser-engine tests (no downloads or browser required)
-        run: node --test tests/test_browser_validator.mjs
+        run: node --test tests/test_browser_validator.mjs tests/test_browser_preflight_v2b.mjs
