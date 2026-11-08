@@ -1,6 +1,6 @@
 /**
  * DSM-ES-VALIDATOR-002B — local PDF/DOCX browser preflight (community proposal).
- * No fetch(), uploads, external scripts, OCR, rendering or macro execution.
+ * No network calls, uploads, external scripts, OCR, rendering or macro execution.
  * PDF: signature/trailer only, never real PDF parsing.
  * DOCX: bounded ZIP directory and CRC-verified XML metadata.
  */
