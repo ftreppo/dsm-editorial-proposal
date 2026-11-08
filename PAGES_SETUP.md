@@ -13,7 +13,7 @@ The site includes a self-contained IT/DE/EN landing page at `docs/index.html` an
 6. Test IT/DE/EN switch, copy button, repo links, mobile layout and text-only fallback.
 
 ## Status boundaries
-- The landing page explains the editorial standard and allows copying a prompt; it does **not** generate documents, fetch documents, upload files or run the validator.
+- The landing page explains the editorial standard and allows copying a prompt; it does not generate or upload documents. The separate `validate.html` page **does** read a user-selected JSON file in-browser and runs a limited deterministic V1 validation without uploading the file.
 - Readers need to share the prompt and their *own rights-cleared material* with an AI assistant that can access GitHub; do not assume such access exists.
 - Logo, palette and typography in the visual-identity proposal are pending institutional verification. The landing intentionally uses a text-only independent community identity.
 - Do not publish actual pupils' data, diagnoses or unpublished school examinations.
