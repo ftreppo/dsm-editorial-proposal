@@ -12,9 +12,19 @@ const NOT_TESTED = [
   "educational_equivalence", "source_fidelity", "translation_quality"
 ];
 
+const SAFE_PATH_KEYS=new Set([
+  "schema_version","document_id","version","status","profile","use_case","title",
+  "subject","class_or_audience","source_language","support_languages",
+  "response_languages","translation_status","date","duration_minutes","max_points",
+  "source_reference","distribution","approval","editor_reviewed",
+  "translation_reviewed","assessor_approved","assessment","restrictions",
+  "assessed_competences_per_task","policy_pack_reference","sections","section_id",
+  "kind","texts","points","answer_area","de","it","en"
+]);
 function pointer(parts) {
   if (!parts.length) return "/";
-  return "/" + parts.map(x => String(x).replace(/~/g, "~0").replace(/\//g, "~1")).join("/");
+  return "/" + parts.map(x=>String(typeof x==="number" || SAFE_PATH_KEYS.has(x)?x:"*")
+    .replace(/~/g,"~0").replace(/\//g,"~1")).join("/");
 }
 function issue(category, code, severity, path, message) {
   return {category, code, severity, path, message};
