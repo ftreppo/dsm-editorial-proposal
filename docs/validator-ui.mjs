@@ -6,7 +6,7 @@ const ui = {
     lede:"La prima versione controlla struttura, metadati, lingue, esercizi e punteggi. Il documento resta nel tuo browser: nessun caricamento su GitHub o su server esterni.",
     choose:"Seleziona un documento strutturato (.json, max 2 MiB)",
     format:"PDF e Word non sono supportati da questa versione. I file devono seguire lo schema DSM-ES v0.1.",
-    run:"Verifica il documento", example:"Scarica un esempio JSON", result:"Rapporto V1 · Solo controlli eseguiti",
+    run:"Verifica il documento", example:"Apri un esempio JSON", result:"Rapporto V1 · Solo controlli eseguiti",
     findingsTitle:"Osservazioni",coverageTitle:"Copertura",
     coverage:"Non verificati: identità visiva, PDF/UA, equivalenza didattica, misure LRS, fedeltà all'originale e correttezza della traduzione.",
     save:"Scarica il rapporto JSON",privacyHeading:"Privacy e limiti.",
