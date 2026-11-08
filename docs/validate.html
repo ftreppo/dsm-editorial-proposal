@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<meta name="description" content="Validatore locale DSM-ES V1: controlli strutturali di JSON, senza upload e senza server.">
-<title>DSM-ES · Verifica documento JSON · V1</title>
+<meta name="description" content="Validatore DSM-ES locale: JSON V1, PDF e DOCX preflight V2b. Nessun upload o server.">
+<title>DSM-ES · Verifica locale JSON, PDF e DOCX</title>
 <style>
 :root{--ink:#20272d;--muted:#58636d;--paper:#fbfaf7;--surface:#fff;--line:#d9dedf;--accent:#244b5f;--focus:#a06317}
 *{box-sizing:border-box}
@@ -62,20 +62,20 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;padd
 <button type="button" data-lang="en" aria-pressed="false">EN</button>
 </div></div></header>
 <main id="main" class="wrap">
- <div class="eyebrow">DSM-ES-VALIDATOR-001 · V1 · COMMUNITY PROPOSAL</div>
- <h1 data-i18n="title">Verifica locale di un documento JSON</h1>
- <p class="lede" data-i18n="lede">La prima versione controlla struttura, metadati, lingue, esercizi e punteggi. Il documento resta nel tuo browser: nessun caricamento su GitHub o su server esterni.</p>
+ <div class="eyebrow">DSM-ES-VALIDATOR-001 / 002B · V1 + V2b · COMMUNITY PROPOSAL</div>
+ <h1 data-i18n="title">Verifica locale JSON, PDF e DOCX</h1>
+ <p class="lede" data-i18n="lede">JSON: controlli strutturali. DOCX: preflight ZIP/XML e margini. PDF: solo intestazione e fine file, senza parsing completo. I documenti non escono dal browser.</p>
  <section class="card" aria-label="Validate file">
-   <label for="jsonFile" data-i18n="choose">Seleziona un documento strutturato (.json, max 2 MiB)</label>
-   <input type="file" id="jsonFile" accept="application/json,.json" aria-describedby="fileHelp">
-   <p id="fileHelp" class="fineprint" data-i18n="format">PDF e Word non sono supportati da questa versione. I file devono seguire lo schema DSM-ES v0.1.</p>
+   <label for="documentFile" data-i18n="choose">Seleziona JSON (2 MiB), PDF o DOCX (12 MiB)</label>
+   <input type="file" id="documentFile" accept="application/json,.json,application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx" aria-describedby="fileHelp">
+   <p id="fileHelp" class="fineprint" data-i18n="format">La verifica PDF è limitata all’intestazione e al trailer. DOCX controlla solo metadati tecnici: non certifica accessibilità, impaginazione o LRS.</p>
    <div class="controls">
      <button type="button" id="run" data-i18n="run">Verifica il documento</button>
      <a href="https://github.com/ftreppo/dsm-editorial-proposal/blob/main/examples/synthetic-physics.json" target="_blank" rel="noopener" class="button secondary" id="example" data-i18n="example">Apri un esempio JSON</a>
    </div>
  </section>
  <section id="reportSection" class="card report" aria-live="polite" aria-atomic="false">
-   <div class="eyebrow" data-i18n="result">Rapporto V1 · Solo controlli eseguiti</div>
+   <div class="eyebrow" data-i18n="result">Rapporto V1 / V2b · Solo controlli eseguiti</div>
    <div id="status" class="status"></div>
    <p id="statusExplanation" class="fineprint"></p>
    <h2 data-i18n="findingsTitle">Osservazioni</h2>
@@ -87,7 +87,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;padd
      <button type="button" class="secondary" id="save" data-i18n="save">Scarica il rapporto JSON</button>
    </div>
  </section>
- <p class="notice"><strong data-i18n="privacyHeading">Privacy e limiti.</strong> <span data-i18n="privacy">Il file viene letto esclusivamente nel browser; viene richiesto al sito soltanto lo schema pubblico delle regole. Nessun contenuto del documento o risultato viene trasmesso. PASS non significa conformità totale né approvazione della scuola.</span></p>
+ <p class="notice"><strong data-i18n="privacyHeading">Privacy e limiti.</strong> <span data-i18n="privacy">Il file resta nel browser. Soltanto per JSON viene richiesto lo schema pubblico dal sito. Nessun documento o rapporto viene caricato. PDF e DOCX possono restituire solo REVIEW o FAIL.</span></p>
  <p class="fineprint"><a href="https://github.com/ftreppo/dsm-editorial-proposal/blob/main/validator/README.md" target="_blank" rel="noopener" data-i18n="docs">Leggi i limiti e la CLI del validatore</a></p>
 </main>
 <footer><div class="wrap">DSM Editorial Standard · Proposta non ufficiale · Franco Treppo, 8.11.2026</div></footer>
