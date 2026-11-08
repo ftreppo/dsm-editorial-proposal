@@ -1,0 +1,93 @@
+name: DSM-ES V2c — local PDF.js engine build and browser verification
+
+on:
+  pull_request:
+    paths:
+      - 'docs/pdf-engine-v2c.mjs'
+      - 'docs/validator-ui.mjs'
+      - 'docs/validate.html'
+      - 'docs/index.html'
+      - 'tests/test_pdf_engine_v2c_e2e.py'
+      - 'PAGES_SETUP.md'
+      - '.github/workflows/pdf-engine-v2c.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/pdf-engine-v2c.mjs'
+      - 'docs/validator-ui.mjs'
+      - 'docs/validate.html'
+      - 'docs/index.html'
+      - 'tests/test_pdf_engine_v2c_e2e.py'
+      - 'PAGES_SETUP.md'
+      - '.github/workflows/pdf-engine-v2c.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pdf-browser-e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned PDF.js from npm (CI only)
+        run: |
+          npm install --prefix "$RUNNER_TEMP/dsm-pdfjs" --no-save --ignore-scripts --no-audit --no-fund pdfjs-dist@6.5.438
+          mkdir -p docs/vendor/pdfjs
+          cp "$RUNNER_TEMP/dsm-pdfjs/node_modules/pdfjs-dist/build/pdf.min.mjs" docs/vendor/pdfjs/pdf.mjs
+          cp "$RUNNER_TEMP/dsm-pdfjs/node_modules/pdfjs-dist/build/pdf.worker.min.mjs" docs/vendor/pdfjs/pdf.worker.mjs
+          cp "$RUNNER_TEMP/dsm-pdfjs/node_modules/pdfjs-dist/LICENSE" docs/vendor/pdfjs/LICENSE
+          printf 'pdfjs-dist 6.5.438\n' > docs/vendor/pdfjs/VERSION
+          sha256sum docs/vendor/pdfjs/pdf.mjs docs/vendor/pdfjs/pdf.worker.mjs > docs/vendor/pdfjs/SHA256SUMS
+      - name: Install headless Chromium test dependencies
+        run: |
+          python -m pip install playwright==1.56.0 "PyMuPDF>=1.24,<2"
+          python -m playwright install --with-deps chromium
+      - name: Test real PDF geometry, text and privacy in Chromium
+        run: python -m unittest discover -s tests -p 'test_pdf_engine_v2c_e2e.py' -v
+
+  vendor-build:
+    needs: pdf-browser-e2e
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact PDF.js version and copy public same-origin assets
+        run: |
+          npm install --prefix "$RUNNER_TEMP/dsm-pdfjs" --no-save --ignore-scripts --no-audit --no-fund pdfjs-dist@6.5.438
+          mkdir -p docs/vendor/pdfjs
+          cp "$RUNNER_TEMP/dsm-pdfjs/node_modules/pdfjs-dist/build/pdf.min.mjs" docs/vendor/pdfjs/pdf.mjs
+          cp "$RUNNER_TEMP/dsm-pdfjs/node_modules/pdfjs-dist/build/pdf.worker.min.mjs" docs/vendor/pdfjs/pdf.worker.mjs
+          cp "$RUNNER_TEMP/dsm-pdfjs/node_modules/pdfjs-dist/LICENSE" docs/vendor/pdfjs/LICENSE
+          printf 'pdfjs-dist 6.5.438\n' > docs/vendor/pdfjs/VERSION
+          sha256sum docs/vendor/pdfjs/pdf.mjs docs/vendor/pdfjs/pdf.worker.mjs > docs/vendor/pdfjs/SHA256SUMS
+      - name: Commit strictly vendored static assets if main has not drifted
+        run: |
+          git fetch origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" || { echo 'HOLD: main advanced; no vendor commit'; exit 1; }
+          git add docs/vendor/pdfjs/pdf.mjs docs/vendor/pdfjs/pdf.worker.mjs docs/vendor/pdfjs/LICENSE docs/vendor/pdfjs/VERSION docs/vendor/pdfjs/SHA256SUMS
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'vendor(pdfjs): pin 6.5.438 same-origin browser assets'
+            git push origin HEAD:main
+          else
+            echo 'PDF.js assets already match pinned version'
+          fi
+      - name: Pages publishing note
+        run: echo 'GitHub Pages branch deployments are not triggered by GITHUB_TOKEN pushes. A subsequent maintainer-authored commit may be required.'

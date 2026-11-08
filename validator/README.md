@@ -2,6 +2,22 @@
 **Status:** V1 prototype, independent community proposal; not official Deutsche Schule Mailand policy.  
 **Initiated by Franco Treppo · 8.11.2026**
 
+## V2c — real PDF.js parsing in the browser (pending deployment gates)
+
+V2c replaces the signature-only PDF preflight with Mozilla **pdfjs-dist v6.5.438**, installed by a pinned **GitHub Actions build** and hosted from this site's own `docs/vendor/pdfjs/` folder. There is no CDN dependency at runtime. PDF document bytes, filenames, content and reports are never sent to GitHub, Mozilla or another service by this validator.
+
+**When the bundled PDF.js module and worker are available**, the browser can examine up to 50 pages / 12 MiB and report page count, effective A4 portrait geometry, approximate text extraction coverage and blank/scanned-looking pages. Reports contain only aggregate counts, generic findings and local SHA-256. A `REVIEW` result is always mandatory even when page geometry and extractable text pass: there is no PDF/UA, visual-rendering, LRS, pedagogical, logo rights or translation attestation.
+
+**If PDF.js assets are not yet installed on Pages**, the browser falls back safely to V2b PDF signature/trailer checks with the explicit finding `PDF_ENGINE_UNAVAILABLE`; geometry and text stay `NOT_TESTED`. The fallback prevents broken Pages deployments from incorrectly claiming complete inspection.
+
+**Build and deployment:** The project uses `.github/workflows/pdf-engine-v2c.yml` to install the exact npm package in a temporary runner, copy the minified display module, worker and Apache 2.0 license to first-party static assets, test with synthetic PDFs in real headless Chromium, and (only after merge into main) commit those verified assets with a guarded branch-head check. GitHub Pages is configured to publish from `main /docs`: commits made by GitHub Actions using `GITHUB_TOKEN` do **not** trigger a Pages build. A subsequent maintainer-authored commit and a direct Pages smoke check are required after the vendor-assets commit. Do not imply V2c has been deployed solely because the PR CI passes.
+
+The PDF.js project is licensed under Apache License 2.0. Its copy is distributed with LICENSE, VERSION and SHA256SUMS. Upgrading PDF.js requires updating version references and re-running all test suites; no automatic version drift.
+
+**Security:** the parser runs in a web worker wherever the browser supports it, with `isEvalSupported:false` and no external document URLs. PDF files can be malicious: only handle documents on authorized machines and keep the browser up to date. The 12 MiB / 50-page limits reduce denial-of-service exposure but do not establish full isolation. Non-text/scanned PDFs require separate accessibility review; V2c performs no OCR or translation.
+
+---
+
 ## V2b — GitHub Pages browser preflight (PDF/DOCX pilot)
 
 The same [public validator page](../docs/validate.html) also accepts **PDF and DOCX directly in the browser**. It uses only first-party JavaScript and built-in browser APIs: no server, CDN, third-party fonts, external processing or file upload. PDF/DOCX limit: **12 MiB**.

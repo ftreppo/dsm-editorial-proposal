@@ -29,3 +29,16 @@ After deployment, test `/validate.html` from the landing page:
 **Future:** add a genuine client-side PDF engine and rendered-document accessibility checks before claiming more than preliminary preflight. Never upload school material to a public GitHub Action or external endpoint.
 
 **Signed: Franco Treppo — 8.11.2026**
+
+## V2c — local PDF.js assets and publishing gate
+
+V2c uses a pinned, first-party Mozilla PDF.js distribution; browser users do **not** contact an external CDN. The source files in `main` contain the loader, but the large minified PDF.js display module and worker are produced from `pdfjs-dist@6.5.438` by the GitHub Action `.github/workflows/pdf-engine-v2c.yml`.
+
+1. On the V2c Pull Request, **all CI gates must PASS**, including a real Chromium test with synthetic PDFs. No user files are used in CI.
+2. After a reviewed merge, the workflow verifies the same pinned build, checks for branch drift and commits `docs/vendor/pdfjs/` to `main` using `GITHUB_TOKEN`.
+3. Because GITHUB_TOKEN pushes **do not trigger a GitHub Pages deployment from a branch**, a separate maintainer-authored commit is required afterward to trigger deployment. Do not claim V2c is publicly live merely because CI passes.
+4. Confirm the live page fetches only same-origin `/vendor/pdfjs/pdf.mjs` and `/vendor/pdfjs/pdf.worker.mjs`; verify the report engine reports `DSM-ES-VALIDATOR-002C/pdfjs-v0.1`, **not** `V2b fallback`.
+5. Test at least a synthetic A4 text PDF, a non-A4 PDF and a blank/scanned-look PDF in the actual published browser. For older browsers or missing assets the interface will report `PDF_ENGINE_UNAVAILABLE` and leave geometry/text `NOT_TESTED`.
+
+**Caution:** Parsed PDF page geometry/text does not establish PDF/UA, actual visual styling, LRS equivalence, brand authorization or school endorsement. See `validator/README.md`.
+
