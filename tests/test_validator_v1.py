@@ -48,6 +48,14 @@ class MetadataValidatorTests(unittest.TestCase):
         self.assertEqual(r["overall"], "FAIL")
         self.assertIn("SCHEMA_REQUIRED", codes(r))
 
+    def test_schema_failure_does_not_claim_semantic_validation(self):
+        d = document()
+        d.pop("title")
+        r = validate_document(d)
+        self.assertEqual(r["checks"]["schema"], "FAIL")
+        self.assertEqual(r["checks"]["languages"], "NOT_TESTED")
+        self.assertEqual(r["checks"]["assessment"], "NOT_TESTED")
+
     def test_unknown_property_fails_schema(self):
         r = validate_document(document(secret_flag="bad"))
         self.assertIn("SCHEMA_ADDITIONALPROPERTIES", codes(r))
