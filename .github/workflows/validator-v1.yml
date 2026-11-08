@@ -69,7 +69,7 @@ jobs:
         run: node --test tests/test_browser_validator.mjs tests/test_browser_preflight_v2b.mjs
 
   browser-e2e:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
