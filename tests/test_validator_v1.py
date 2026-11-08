@@ -138,6 +138,15 @@ class MetadataValidatorTests(unittest.TestCase):
         report_json = json.dumps(validate_document(d))
         self.assertNotIn("CONFIDENTIAL_SENTINEL", report_json)
 
+    def test_user_supplied_object_keys_are_redacted(self):
+        d = document(profile="ASSESSMENT", use_case="ASSESSMENT",
+                     assessment={"restrictions": [],
+                                 "assessed_competences_per_task": {"PRIVATE_STUDENT_NAME_484": 7}})
+        r = validate_document(d)
+        self.assertIn("SCHEMA_TYPE", codes(r))
+        self.assertNotIn("PRIVATE_STUDENT_NAME_484", json.dumps(r))
+        self.assertTrue(any("*" in f["path"] for f in r["findings"]))
+
     def test_source_sha_is_stable_for_same_bytes(self):
         raw = json.dumps(document(), ensure_ascii=False, sort_keys=True).encode()
         a = validate_document(document(), raw)
