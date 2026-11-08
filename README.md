@@ -21,6 +21,10 @@ An open, versioned proposal for bilingual and accessible educational documents, 
 
 **Bilingual instructions do not automatically authorize bilingual answers.** Translation is optional and requires pedagogical review.
 
+## Start here — public landing page
+
+A simple IT / DE / EN landing page with instructions and a copyable prompt is staged at [docs/index.html](docs/index.html). To publish it using GitHub Pages after review, follow [PAGES_SETUP.md](PAGES_SETUP.md). The webpage is **not** an online validator and does not accept documents.
+
 ## Contents
 - [Editorial specification](standard/DSM-ES-v0.1.md)
 - [Teacher Creator prompt](prompts/teacher-creator.md)

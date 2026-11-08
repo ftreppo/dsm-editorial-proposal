@@ -1,0 +1,32 @@
+name: Landing page smoke checks
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'tests/test_landing_static.py'
+      - 'PAGES_SETUP.md'
+      - '.github/workflows/site-smoke.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'tests/test_landing_static.py'
+      - 'PAGES_SETUP.md'
+      - '.github/workflows/site-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run offline site smoke tests
+        run: python -m unittest discover -s tests -p 'test_landing_static.py' -v
