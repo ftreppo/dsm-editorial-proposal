@@ -1,16 +1,17 @@
 import {validateDocument, MAX_BYTES, ENGINE_VERSION} from "./validator-v1.mjs";
+import {preflight,MAX_INPUT_BYTES,ENGINE_VERSION as BINARY_ENGINE} from "./preflight-v2b.mjs";
 
 const ui = {
   it: {
-    title:"Verifica locale di un documento JSON",
-    lede:"La prima versione controlla struttura, metadati, lingue, esercizi e punteggi. Il documento resta nel tuo browser: nessun caricamento su GitHub o su server esterni.",
-    choose:"Seleziona un documento strutturato (.json, max 2 MiB)",
-    format:"PDF e Word non sono supportati da questa versione. I file devono seguire lo schema DSM-ES v0.1.",
-    run:"Verifica il documento", example:"Apri un esempio JSON", result:"Rapporto V1 · Solo controlli eseguiti",
+    title:"Verifica locale JSON, PDF e DOCX",
+    lede:"JSON: controlli strutturali V1. DOCX: controllo preliminare di archivio, testo e margini dichiarati. PDF: solo firma e fine file, non un’analisi completa. Tutto resta nel browser.",
+    choose:"Seleziona JSON (2 MiB), PDF o DOCX (12 MiB)",
+    format:"La verifica PDF è limitata all’intestazione e al trailer. DOCX verifica soltanto indizi tecnici; non esegue controlli grafici completi, PDF/UA o LRS.",
+    run:"Verifica il documento", example:"Apri un esempio JSON", result:"Rapporto V1 / V2b · Solo controlli eseguiti",
     findingsTitle:"Osservazioni",coverageTitle:"Copertura",
     coverage:"Non verificati: identità visiva, PDF/UA, equivalenza didattica, misure LRS, fedeltà all'originale e correttezza della traduzione.",
     save:"Scarica il rapporto JSON",privacyHeading:"Privacy e limiti.",
-    privacy:"Il file viene letto esclusivamente nel browser; viene richiesto al sito soltanto lo schema pubblico delle regole. Nessun contenuto del documento o risultato viene trasmesso. PASS non significa conformità totale né approvazione della scuola.",
+    privacy:"Il documento resta nel browser. Soltanto per JSON viene richiesto lo schema pubblico dallo stesso sito. Nessun file o rapporto è caricato. Per PDF e DOCX il risultato è sempre REVIEW o FAIL, mai conformità totale.",
     docs:"Leggi i limiti e la CLI del validatore",
     busy:"Verifica in corso…",noFile:"Seleziona prima un file JSON.",oversize:"Il documento supera il limite locale di 2 MiB.",
     invalid:"Non è stato possibile leggere un documento JSON valido. Il file rimane sul dispositivo.",
@@ -22,15 +23,15 @@ const ui = {
     noHash:"non disponibile nel browser",version:"Motore"
   },
   de: {
-    title:"Lokale Prüfung eines JSON-Dokuments",
-    lede:"V1 prüft Struktur, Metadaten, Sprachen, Aufgaben und Punkte. Das Dokument bleibt im Browser; keine Übertragung an GitHub oder externe Server.",
-    choose:"Strukturiertes Dokument wählen (.json, max. 2 MiB)",
-    format:"PDF und Word werden in dieser Version nicht unterstützt. JSON muss dem DSM-ES-v0.1-Schema entsprechen.",
-    run:"Dokument prüfen",example:"JSON-Beispiel öffnen",result:"V1-Bericht · Nur tatsächlich ausgeführte Prüfungen",
+    title:"JSON-, PDF- und DOCX-Prüfung im Browser",
+    lede:"JSON: Strukturprüfung V1. DOCX: ZIP, Textläufe und deklarierte Seitenränder. PDF: nur Header und Dateiende, keine vollständige PDF-Analyse. Alles bleibt im Browser.",
+    choose:"JSON (2 MiB), PDF oder DOCX (12 MiB) wählen",
+    format:"PDF-Prüfung nur Header/Dateiende; DOCX nur technische Vorprüfung. Keine vollständige Layout-, PDF/UA- oder LRS-Zertifizierung.",
+    run:"Dokument prüfen",example:"JSON-Beispiel öffnen",result:"V1-/V2b-Bericht · Nur ausgeführte Prüfungen",
     findingsTitle:"Ergebnisse",coverageTitle:"Prüfumfang",
     coverage:"Nicht geprüft: visuelle Identität, PDF/UA, didaktische Gleichwertigkeit, LRS-Maßnahmen, Inhaltstreue und Übersetzungsqualität.",
     save:"JSON-Bericht speichern",privacyHeading:"Datenschutz und Grenzen.",
-    privacy:"Die Datei wird nur im Browser gelesen; ausschließlich das öffentliche Regelschema wird vom selben Webauftritt geladen. Weder Dokumentinhalt noch Bericht werden übertragen. PASS ist keine vollständige Konformität oder Schulfreigabe.",
+    privacy:"Das Dokument bleibt lokal im Browser. Nur für JSON wird das öffentliche Schema vom selben Webauftritt geladen. Dateien und Berichte werden nicht hochgeladen. PDF/DOCX liefern nur REVIEW oder FAIL.",
     docs:"Grenzen und CLI-Anleitung lesen",
     busy:"Prüfung läuft…",noFile:"Bitte zuerst eine JSON-Datei auswählen.",oversize:"Die Datei überschreitet das Limit von 2 MiB.",
     invalid:"Die Datei konnte nicht als gültiges JSON gelesen werden. Sie bleibt auf deinem Gerät.",
@@ -42,15 +43,15 @@ const ui = {
     noHash:"im Browser nicht verfügbar",version:"Prüfmodul"
   },
   en: {
-    title:"Validate a JSON document locally",
-    lede:"V1 checks structure, metadata, languages, exercises and points. Your document stays in the browser; it is not uploaded to GitHub or external servers.",
-    choose:"Choose a structured document (.json, max 2 MiB)",
-    format:"PDF and Word are not supported in this version. JSON must match the DSM-ES v0.1 schema.",
-    run:"Validate document",example:"Open a JSON example",result:"V1 report · Executed checks only",
+    title:"Validate JSON, PDF and DOCX locally",
+    lede:"JSON: V1 structure checks. DOCX: preliminary ZIP, text-run and declared-margin checks. PDF: header/trailer only, not full parsing. Files stay in your browser.",
+    choose:"Choose JSON (2 MiB), PDF or DOCX (12 MiB)",
+    format:"PDF check is header/trailer only; DOCX checks technical metadata. This does not certify layout, PDF/UA, or LRS compliance.",
+    run:"Validate document",example:"Open a JSON example",result:"V1 / V2b report · Executed checks only",
     findingsTitle:"Findings",coverageTitle:"Coverage",
     coverage:"Not tested: visual identity, PDF/UA, educational equivalence, LRS accommodations, original-content fidelity or translation accuracy.",
     save:"Download JSON report",privacyHeading:"Privacy and limitations.",
-    privacy:"Files are read only in your browser; only the public rules schema is fetched from this site. No document contents or results are sent. PASS does not imply total conformance or school approval.",
+    privacy:"Documents remain in your browser. Only JSON validation fetches the public schema from this site. No file or report is uploaded. PDF/DOCX can only return REVIEW or FAIL.",
     docs:"Read validator limits and CLI documentation",
     busy:"Validating…",noFile:"Select a JSON file first.",oversize:"This file exceeds the 2 MiB limit.",
     invalid:"Could not parse a valid JSON document. The file remains on your device.",
@@ -63,7 +64,7 @@ const ui = {
   }
 };
 const $ = x => document.getElementById(x);
-const fileInput = $("jsonFile"), runButton = $("run"), reportSection=$("reportSection");
+const fileInput = $("documentFile"), runButton = $("run"), reportSection=$("reportSection");
 let lang = new URLSearchParams(window.location.search).get("lang") || "it";
 if(!ui[lang]) lang="it";
 let latest = null;
@@ -88,7 +89,7 @@ for (const button of document.querySelectorAll("[data-lang]")) {
 }
 applyLanguage(lang);
 function reportError(code) {
-  latest={overall:"INPUT_ERROR", engine_version:ENGINE_VERSION, checks:{}, findings:[],
+  latest={overall:"INPUT_ERROR", engine_version:BINARY_ENGINE+" / "+ENGINE_VERSION, checks:{}, findings:[],
     finding_count:0, input_sha256:null,
     input_error:code, not_an_official_approval:true};
   render(latest);
@@ -112,7 +113,7 @@ function render(report) {
     for (const item of report.findings) {
       const row=document.createElement("div");row.className="finding";
       const title=document.createElement("strong");
-      title.textContent=item.severity+" · "+item.code+" · "+item.path;
+      title.textContent=item.severity+" · "+item.code+(item.path?" · "+item.path:"");
       const body=document.createElement("p");
       body.textContent=item.message;
       row.append(title,body);findings.appendChild(row);
@@ -139,17 +140,23 @@ async function getHash(buffer) {
 runButton.addEventListener("click",async()=>{
   const file=fileInput.files?.[0];
   if(!file) {reportError("noFile");return;}
-  if(!/\.json$/i.test(file.name)){reportError("invalid");return;}
-  if(file.size > MAX_BYTES){reportError("oversize");return;}
+  const ext=file.name.toLowerCase().match(/\.(json|pdf|docx)$/)?.[1];
+  if(!ext){reportError("invalid");return;}
+  if(file.size > (ext==="json"?MAX_BYTES:MAX_INPUT_BYTES)){reportError("oversize");return;}
   runButton.disabled=true;runButton.textContent=ui[lang].busy;
   try {
     const buffer=await file.arrayBuffer();
-    const raw=new TextDecoder("utf-8",{fatal:true}).decode(buffer).replace(/^\uFEFF/,"");
-    let doc;
-    try{doc=JSON.parse(raw);}catch(_){reportError("invalid");return;}
-    let schema;
-    try{schema=await getSchema();}catch(_){reportError("network");return;}
-    const validation=validateDocument(doc,schema);
+    let validation;
+    if(ext==="json"){
+      const raw=new TextDecoder("utf-8",{fatal:true}).decode(buffer).replace(/^\uFEFF/,"");
+      let doc;
+      try{doc=JSON.parse(raw);}catch(_){reportError("invalid");return;}
+      let schema;
+      try{schema=await getSchema();}catch(_){reportError("network");return;}
+      validation=validateDocument(doc,schema);
+    } else {
+      validation=await preflight(buffer,ext);
+    }
     const input_sha256=await getHash(buffer);
     latest={...validation,input_sha256};
     render(latest);
@@ -160,6 +167,6 @@ $("save").addEventListener("click",()=>{
   if(!latest || latest.overall==="INPUT_ERROR")return;
   const blob=new Blob([JSON.stringify(latest,null,2)+"\n"],{type:"application/json"});
   const url=URL.createObjectURL(blob),link=document.createElement("a");
-  link.href=url;link.download="dsm-es-validation-v1.json";document.body.append(link);link.click();link.remove();
+  link.href=url;link.download="dsm-es-validation-report.json";document.body.append(link);link.click();link.remove();
   setTimeout(()=>URL.revokeObjectURL(url),500);
 });

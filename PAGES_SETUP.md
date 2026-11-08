@@ -2,7 +2,7 @@
 **Public community proposal, not an official DSM web property.**
 
 ## Files
-The site includes a self-contained IT/DE/EN landing page at `docs/index.html` and an independent on-device structured JSON V1 validator at `docs/validate.html`. It has **no analytics, third-party scripts, upload endpoint, paid AI API or server-side validation**. The validator fetches only a public, same-origin static schema from `docs/specification/document.schema.json`; document contents and reports remain local.
+The site includes a self-contained IT/DE/EN landing page at `docs/index.html` and an on-device JSON V1 + PDF/DOCX V2b pilot at `docs/validate.html`. It has **no analytics, third-party scripts, upload endpoint, paid AI API or server-side validation**. Only JSON validation fetches the public, same-origin schema from `docs/specification/document.schema.json`; PDF/DOCX inspection makes no network request. Document contents and reports remain local.
 
 ## Publishing (maintainer action)
 1. Review and merge the landing-page PR into `main`.
@@ -13,14 +13,19 @@ The site includes a self-contained IT/DE/EN landing page at `docs/index.html` an
 6. Test IT/DE/EN switch, copy button, repo links, mobile layout and text-only fallback.
 
 ## Status boundaries
-- The landing page explains the editorial standard and allows copying a prompt; it does not generate or upload documents. The separate `validate.html` page **does** read a user-selected JSON file in-browser and runs a limited deterministic V1 validation without uploading the file.
+- The landing page explains the editorial standard and allows copying a prompt; it does not generate or upload documents. The separate `validate.html` page reads a user-selected JSON, PDF or DOCX file in-browser without uploading it. JSON runs deterministic V1 checks; PDF checks only the header/trailer; DOCX inspects bounded ZIP/OOXML metadata.
 - Readers need to share the prompt and their *own rights-cleared material* with an AI assistant that can access GitHub; do not assume such access exists.
 - Logo, palette and typography in the visual-identity proposal are pending institutional verification. The landing intentionally uses a text-only independent community identity.
 - Do not publish actual pupils' data, diagnoses or unpublished school examinations.
 
-## Validator V1
-After deployment test `/validate.html` from the main landing page: select the **synthetic JSON fixture**, confirm a `REVIEW` report for draft translation, and download a report. Test IT / DE / EN links. PDF and Word are explicitly unsupported and must not be submitted. The `validator/README.md` documents CLI usage and limitations.
+## Validator V1 / V2b browser pilot
+After deployment, test `/validate.html` from the landing page:
+- Select the **synthetic JSON fixture**, confirm `REVIEW` for draft translation, and download a report.
+- Test a **synthetic DOCX** created on an authorized workstation; it must report `REVIEW`, with declared geometry and extractable text-run indicators. Test IT / DE / EN.
+- Test a **synthetic PDF**; the only guaranteed browser check is the signature/trailer. The report must explicitly show `NOT_TESTED` for PDF page geometry, text extraction and PDF/UA.
+- Confirm all reports stay on-device. Browser pages never claim school endorsement or complete conformance.
+- See `validator/README.md` for strict scope and optional local Python V2 CLI.
 
-**Future:** extend support with local document parsers without silently sending student material to GitHub Actions or to an external backend.
+**Future:** add a genuine client-side PDF engine and rendered-document accessibility checks before claiming more than preliminary preflight. Never upload school material to a public GitHub Action or external endpoint.
 
 **Signed: Franco Treppo — 8.11.2026**

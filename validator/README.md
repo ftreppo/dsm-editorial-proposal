@@ -2,6 +2,20 @@
 **Status:** V1 prototype, independent community proposal; not official Deutsche Schule Mailand policy.  
 **Initiated by Franco Treppo · 8.11.2026**
 
+## V2b — GitHub Pages browser preflight (PDF/DOCX pilot)
+
+The same [public validator page](../docs/validate.html) also accepts **PDF and DOCX directly in the browser**. It uses only first-party JavaScript and built-in browser APIs: no server, CDN, third-party fonts, external processing or file upload. PDF/DOCX limit: **12 MiB**.
+
+**Critical scope difference:** PDF analysis is a *signature/trailer check only*. It does **not** parse PDF objects, page geometry, image content, text, or PDF/UA. All those categories remain `NOT_TESTED`. Word DOCX uses bounded ZIP central-directory checks and CRC-verified XML for declared A4 page size, margins, and visible text-run presence; the result does **not** prove that Word renders a correct page, preserves instructional content or meets WCAG/LRS requirements. PDF and DOCX always finish with overall `REVIEW` (technically inspectable) or `FAIL` (rejected). No `PASS` certification is possible for this pilot.
+
+Browser `DecompressionStream("deflate-raw")` is required for compressed DOCX. Unsupported browser/platform features, ZIP64, encrypted archives, non-ASCII member names, or formats outside this conservative subset fail closed. An explicit technical preflight can be performed on a local authorized workstation with the fuller Python V2 CLI.
+
+The page's JSON V1 checker is unchanged; JSON files still use the versioned public schema. No pupil data or real exams are included in CI. On-device processing does not automatically establish GDPR compliance or authorization to handle any given school document.
+
+**Before declaring the pilot browser-verified**, test on real Chromium and Firefox/Safari with **synthetic fixtures** and inspect downloaded reports. Automated Node tests alone cannot prove mobile or browser behavior.
+
+---
+
 ## V2 — offline PDF, DOCX and HTML preflight (not full conformity)
 
 **Status:** available as an opt-in **local command-line tool**, not as a public browser uploader. The GitHub Pages interface continues to accept only structured JSON.
