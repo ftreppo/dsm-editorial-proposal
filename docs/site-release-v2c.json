@@ -1,0 +1,19 @@
+{
+  "release": "DSM-ES-VALIDATOR-002C",
+  "date": "2026-11-08",
+  "status": "community-beta",
+  "official_school_approval": false,
+  "web_engine": "DSM-ES-VALIDATOR-002C/pdfjs-v0.1",
+  "pdfjs_dist_version": "6.5.438",
+  "pdfjs_display_sha256": "3a88402882cfa3e7e72c2c9b5149f52f0f88baf1c5b62aa11a41abdbc2072440",
+  "pdfjs_worker_sha256": "1e64c8240e54735ec5913b37acd5134747799cb8c6bb3777c70adbc01232d2aa",
+  "code_merge_commit": "ff366f12bf0dbc11e7a718e5da6d52cec67eeaf1",
+  "vendor_commit": "6eacec5b02af04c003fdb9f41741795ab2b8c401",
+  "limits": {
+    "file_max_mib": 12,
+    "page_max": 50,
+    "assesses": "PDF page count, page geometry, extractable text",
+    "does_not_assess": "PDF/UA, visual rendering, brand, LRS, translation, fidelity"
+  },
+  "privacy": "PDF processed client-side. Only same-origin public static assets are downloaded."
+}
