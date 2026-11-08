@@ -70,6 +70,8 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(r["metrics"]["text_extractable_pages"], 1)
         self.assertEqual(r["checks"]["page_geometry"], "PASS")
         self.assertEqual(r["checks"]["pdf_ua_accessibility"], "NOT_TESTED")
+        self.assertEqual(r["checks"]["document_structure"], "NOT_TESTED")
+        self.assertEqual(r["checks"]["basic_accessibility"], "NOT_TESTED")
 
     def test_pdf_landscape_requires_review(self):
         r = validate_file(self.save("landscape.pdf", make_pdf(width=841.89, height=595.276)))
@@ -101,6 +103,8 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(r["metrics"]["a4_portrait_sections"], 1)
         self.assertEqual(r["checks"]["page_geometry"], "PASS")
         self.assertEqual(r["checks"]["visual_rendering"], "NOT_TESTED")
+        self.assertEqual(r["checks"]["document_structure"], "NOT_TESTED")
+        self.assertEqual(r["checks"]["basic_accessibility"], "NOT_TESTED")
 
     def test_docx_us_letter_requires_review(self):
         r = validate_file(self.save("letter.docx", make_docx(width=215.9, height=279.4)))
@@ -146,6 +150,7 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(r["checks"]["basic_accessibility"], "PASS")
         self.assertEqual(r["metrics"]["h1_elements"], 1)
         self.assertEqual(r["checks"]["wcag_full_accessibility"], "NOT_TESTED")
+        self.assertEqual(r["checks"]["page_geometry"], "NOT_TESTED")
 
     def test_html_missing_alt_and_lang(self):
         markup = b'<html><main><h1>Test</h1><img src="x"></main></html>'
@@ -159,6 +164,11 @@ class PreflightTests(unittest.TestCase):
         r = validate_file(self.save("script.html", markup))
         self.assertIn("HTML_SCRIPT_PRESENT", self.codes(r))
         self.assertNotIn("SENTINEL", json.dumps(r))
+
+    def test_html_script_only_is_not_user_visible_body_text(self):
+        markup = b'<html lang="en"><main><h1></h1><script>window.value=7;</script></main></html>'
+        r = validate_file(self.save("script-only.html", markup))
+        self.assertIn("HTML_NO_TEXT", self.codes(r))
 
     def test_html_non_utf8_fails(self):
         r = validate_file(self.save("bad.html", b"<html>\xff</html>"))
