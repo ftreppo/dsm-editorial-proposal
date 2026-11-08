@@ -1,0 +1,63 @@
+# DSM-ES-VALIDATOR-001 — V1 structured-document validator
+**Status:** V1 prototype, independent community proposal; not official Deutsche Schule Mailand policy.  
+**Initiated by Franco Treppo · 8.11.2026**
+
+## What is implemented
+- Python command-line JSON Schema 2020-12 validation using `jsonschema`, plus deterministic cross-field checks for language declaration, translations, full-width answers, points, duplicate sections and assessment competence metadata.
+- IT / DE / EN browser-only tool at [docs/validate.html](../docs/validate.html), with a local JSON file picker and a downloadable JSON report. No file is uploaded: processing is in the user's browser. The browser downloads **only** the public JSON schema from the same GitHub Pages origin.
+- Public synthetic fixture and negative/positive deterministic tests in GitHub Actions.
+- Every report includes `PASS | REVIEW | FAIL` **only for V1 structural scope**, explicit untested categories, findings by stable code, engine version and input SHA-256 (if supported by the browser).
+
+## Command line
+Use Python 3.11+:
+
+```sh
+python -m pip install -r requirements-validator.txt
+python -m validator.cli examples/synthetic-physics.json
+python -m validator.cli examples/synthetic-physics.json --json
+python -m validator.cli examples/synthetic-physics.json --strict-review
+python -m unittest discover -s tests -p 'test_validator_v1.py' -v
+```
+
+Return codes: `0` when PASS or REVIEW (the latter is an intentional draft state), `1` for FAIL or REVIEW with `--strict-review`, `2` when the input cannot be read/parsed. Never use an exit code 0 by itself as evidence of full compliance: inspect `overall` and `checks`.
+
+## Browser interface
+After Pages deployment, open **/validate.html**. Select a structured **JSON** document (maximum 2 MiB), then click **Validate / Verifica / Prüfen**. View individual findings or save the report.
+
+The site does **not** accept PDFs, Word, private student data or school authentication. The site uses no third-party tracking, no LLM and no upload API. The browser requires the canonical schema to be mirrored under `docs/specification/`; CI checks byte-for-byte consistency. Only the static schema is requested over the network.
+
+## Deterministic rule examples
+- JSON Schema required fields and exact format constraints.
+- Source language present in each section; support text present only when declared.
+- `translation_status=DRAFT` with support translations → REVIEW (not a false PASS).
+- Full-width answer area per exercise.
+- Unique section IDs.
+- Sum of exercise points matches `max_points` when fully specified.
+- Assessment profile / per-exercise assessed competence prerequisites.
+- Explicit approval metadata for released documents; never infer permissions.
+
+## Not implemented or not automatically verifiable
+| Category | Status |
+|---|---|
+| PDF/DOCX rendering/layout, actual fonts, logo permissions | NOT_TESTED |
+| PDF/UA and WCAG compliance | NOT_TESTED |
+| Source document fidelity or semantic equivalence | NOT_TESTED |
+| Translation quality and added hints | NOT_TESTED |
+| LRS Adapter / PolicyPack authorized measures | NOT_TESTED |
+| Institutional endorsement / assessment approval | NOT_GRANTED |
+
+For secure evaluation of real pupil material, use only an **authorized local device** and an approved data-handling procedure; don't upload the material to the public repo or CI.
+
+## Known V1 limits
+- Python uses a full Draft 2020-12 JSON Schema engine, while the browser engine intentionally supports **only** the subset of JSON Schema keywords present in the versioned DSM-ES schema. Unsupported constraints cause a hard error, not a PASS. CI checks supported keywords and deterministic fixtures.
+- The browser's native JSON parser does not reject duplicate object keys; the Python CLI **does** reject them. Use the Python CLI where strict JSON parsing is important.
+- A declared `REVIEWED` translation or approval metadata is not proof that a human has actually reviewed the document. Those are untrusted self-reported fields.
+- The schema's allowed metadata does not assert the absence of confidential information in text. This validator does **not** conduct a privacy scan or make a GDPR judgment.
+- No automatic format conversion, PDF generation, editing or publication.
+
+## Next steps
+1. V2: local HTML/DOCX/PDF geometry and accessibility extractors; tests with synthetic documents.
+2. V3: separate LRS Adapter integration with explicit authorization/competence gates and human review.
+3. V4: validated, signed releases with immutable version identifiers and controlled permissions.
+
+**Proposed by Franco Treppo, 8.11.2026.**
