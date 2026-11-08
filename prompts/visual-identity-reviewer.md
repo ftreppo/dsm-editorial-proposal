@@ -8,7 +8,8 @@ Receive official web references, historical/public documents, sample newsletters
 ## Work
 1. **Inventory and classify every source**: public-current, historical, private-not-for-publication, proposal, unknown.
 2. Examine **logo, color, fonts, white space, header, contacts, address, section/paragraph hierarchy, page-number/footer, language order, table/exercise layout and reflow accessibility**.
-3. Create an **evidence matrix**: observed fact, sample source and date, confidence, contradictions and unresolved items.
+3. **Validate publication metadata**: compare email subject, in-document title, issue number, dates, linked document version and contact information. Flag inconsistencies as `METADATA_REVIEW_REQUIRED`; never silently rewrite an external original.
+4. Create an **evidence matrix**: observed fact, sample source and date, confidence, contradictions and unresolved items.
 4. Do not equate frequent practice with a binding official design standard. Differences between departments and years must be recorded explicitly.
 5. Prefer a **minimal, accessible, print-friendly A4 proposal** with a compact header and full-width task answer region. Parent-facing communication may be DE then IT; student tasks may be parallel DE/IT only when pedagogically authorized.
 6. Keep **source language, supporting translation, and permissible answer language** separate. Do not override assessed competence or authorized LRS Adapter PolicyPack.
