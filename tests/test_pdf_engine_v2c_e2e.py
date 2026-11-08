@@ -81,7 +81,20 @@ class PDFJsBrowserV2c(unittest.TestCase):
         })
         self.page.locator("#run").click()
         self.page.wait_for_function("document.querySelector('#reportSection').classList.contains('visible') && !document.querySelector('#run').disabled", timeout=12000)
-        self.assertFalse(self.page.locator("#save").is_disabled(), "Report download unexpectedly disabled")
+        if self.page.locator("#save").is_disabled():
+            diagnostic=self.page.evaluate("""async () => {
+              try {
+                const m=await import("./pdf-engine-v2c.mjs");
+                const file=document.querySelector("#documentFile").files[0];
+                const report=await m.inspectPdf(await file.arrayBuffer());
+                return {overall:report.overall, engine:report.engine_version,
+                  codes:report.findings.map(f=>f.code)};
+              } catch(error) {
+                return {error:String(error?.message || error),type:String(error?.name)};
+              }
+            }""")
+            self.fail("Input-error status: "+self.page.locator("#statusExplanation").inner_text()+
+                      "; synthetic diagnostic: "+json.dumps(diagnostic))
         with self.page.expect_download(timeout=12000) as info:
             self.page.locator("#save").click()
         download=info.value
