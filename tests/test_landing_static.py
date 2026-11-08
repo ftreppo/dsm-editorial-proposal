@@ -79,7 +79,8 @@ class LandingTests(unittest.TestCase):
 
     def test_links_are_explicit(self):
         self.assertIn("https://github.com/ftreppo/dsm-editorial-proposal/issues", self.html.links)
-        self.assertTrue(all(x.startswith(("https://", "#")) for x in self.html.links))
+        self.assertIn("./validate.html?lang=it", self.html.links)
+        self.assertTrue(all(x.startswith(("https://", "#", "./")) for x in self.html.links))
 
 
 if __name__ == "__main__":
