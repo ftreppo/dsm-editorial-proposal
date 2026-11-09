@@ -219,6 +219,20 @@ function ensurePdfRenderCompat(){
       }
     });
   }
+  // PDF.js canvas graphics also uses WeakMap's new computed upsert method.
+  // Browser releases preceding the 2026 baseline may not provide this API.
+  if(typeof WeakMap.prototype.getOrInsertComputed!=="function"){
+    Object.defineProperty(WeakMap.prototype,"getOrInsertComputed",{
+      configurable:true,writable:true,
+      value:function(key,callback){
+        if(typeof callback!=="function")throw new TypeError("callback must be callable");
+        if(this.has(key))return this.get(key);
+        const result=callback(key);
+        this.set(key,result);
+        return result;
+      }
+    });
+  }
 }
 export async function renderLocalPdfPreview(bytesInput,pageNumber,canvas){
   ensurePdfRenderCompat();
