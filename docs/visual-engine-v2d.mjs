@@ -95,7 +95,9 @@ export function analyzeTextLayout(p) {
     right_mm:round(Math.max(0,p.width-right)*MM),
     bottom_mm:round(Math.max(0,p.height-bottom)*MM)
   };
-  const body=weightedMedian(fontSamples), maxFont=Math.max(...fontSamples.map(s=>s.value));
+  const body=weightedMedian(fontSamples);
+  let maxFont=0;
+  for(const sample of fontSamples)maxFont=Math.max(maxFont,sample.value);
   const metrics={
     page:p.pageNumber,
     measured_from:"PDF_TEXT_GEOMETRY_APPROXIMATE",
