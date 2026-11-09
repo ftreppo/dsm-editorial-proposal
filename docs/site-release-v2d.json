@@ -1,0 +1,36 @@
+{
+  "release": "DSM-ES-VALIDATOR-002D",
+  "date": "2026-11-09",
+  "status": "community-beta",
+  "standard_authority": "INDEPENDENT_COMMUNITY_PROPOSAL_NOT_OFFICIAL_DSM",
+  "engine_version": "DSM-ES-VALIDATOR-002D/pdfjs-visual-v0.1",
+  "pdfjs_dist_version": "6.5.438",
+  "merge_commit": "fe42cebf9178cfeb4e1ce409ce5e16be9c9bbd17",
+  "capabilities": [
+    "PDF text-layer approximate left/top/right/bottom margins",
+    "median and maximum measured text sizes",
+    "per-page vertical text coverage",
+    "cross-page margin consistency",
+    "local canvas page preview with dashed guides"
+  ],
+  "provisional_warning_thresholds": {
+    "margin_mm_below": 12,
+    "median_text_size_pt_below": 9.5,
+    "bottom_blank_mm_above": 110,
+    "cross_page_left_margin_difference_mm_above": 9
+  },
+  "privacy": "Local PDF.js worker + browser canvas. No input PDF, image, filename or content in reports; no upload.",
+  "does_not_certify": [
+    "official DSM brand identity",
+    "logo rights",
+    "PDF/UA",
+    "WCAG",
+    "actual color/overlap fidelity",
+    "bilingual layout",
+    "LRS authorization",
+    "assessed competence",
+    "translation fidelity"
+  ],
+  "overall_result_for_pdf": "REVIEW_or_FAIL",
+  "validation": "Synthetic Node and Chromium tests passed on exact feature PR head."
+}
