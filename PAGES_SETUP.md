@@ -42,3 +42,11 @@ V2c uses a pinned, first-party Mozilla PDF.js distribution; browser users do **n
 
 **Caution:** Parsed PDF page geometry/text does not establish PDF/UA, actual visual styling, LRS equivalence, brand authorization or school endorsement. See `validator/README.md`.
 
+
+## V2d — visual layout pilot on GitHub Pages
+
+V2d builds on V2c and uses the already bundled, same-origin PDF.js library. The page now displays **approximate per-page left/top/right/bottom text margins**, dominant text size, and comments on unusually narrow margins, small dominant text or substantial unused space. It also provides an opt-in local PDF preview with dashed 12 mm caution guides. The preview image never enters the JSON report and is never uploaded.
+
+The thresholds are **independent proposals**, not official DSM design requirements. A large blank lower half can be appropriate for a study guide, and must never be treated as proof of poor quality. Compare with the still-unmerged visual identity Draft PR #5 before any normative design enforcement. All PDF results remain `REVIEW` or `FAIL`, never full institutional `PASS`.
+
+After CI, test a **synthetic two-page PDF** on the published Pages site: view first page, click Next, inspect numeric margins, and download a report. Confirm no off-origin calls or POST requests in developer tools. Check IT/DE/EN. No pupil documents or private school materials belong in public CI.

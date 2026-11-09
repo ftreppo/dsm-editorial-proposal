@@ -99,11 +99,11 @@ class BrowserSmoke(unittest.TestCase):
         download = download_info.value
         self.assertEqual(download.suggested_filename, "dsm-es-validation-report.json")
 
-    def test_pdf_is_signature_only_not_a_full_pass(self):
+    def test_invalid_pdf_signature_but_broken_body_fails_closed(self):
         sample = b"%PDF-1.7\n% SYNTHETIC TEST ONLY\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n"
         self.choose("sample.pdf", sample, "application/pdf")
-        self.assertEqual(self.page.locator("#status").inner_text(), "REVIEW")
-        self.assertIn("PDF_PARSER_NOT_INCLUDED", self.page.locator("#findings").inner_text())
+        self.assertEqual(self.page.locator("#status").inner_text(), "FAIL")
+        self.assertIn("PDF_PARSE_FAILED", self.page.locator("#findings").inner_text())
 
     def test_language_switch_german(self):
         self.page.locator('[data-lang="de"]').click()

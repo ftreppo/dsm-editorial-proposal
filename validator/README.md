@@ -2,6 +2,29 @@
 **Status:** V1 prototype, independent community proposal; not official Deutsche Schule Mailand policy.  
 **Initiated by Franco Treppo · 8.11.2026**
 
+## V2d — Visual layout preflight (independent proposal)
+
+**Status:** proposed beta. V2d builds on real on-device PDF.js parsing and adds **numerical text layout measurements**, not a full automated visual certificate.
+
+From extracted PDF text runs and their transforms, the browser calculates approximate **left/top/right/bottom text margins**, **dominant text size (weighted median)**, **largest detected font size**, per-page vertical text coverage and cross-page margin consistency. The page preview is rendered locally on a canvas with a dashed **12 mm caution guide**. Preview pixels, full text and filenames are **not included in the JSON report** or uploaded anywhere.
+
+### Proposal-specific advisory thresholds — not official DSM requirements
+- Text edges closer than **12 mm** to a page boundary: `NARROW_TEXT_MARGIN` → REVIEW.
+- Dominant text size below **9.5 pt**: `SMALL_MEDIAN_TEXT` → REVIEW.
+- Blank bottom area above **110 mm**: `LARGE_BOTTOM_WHITESPACE` → REVIEW, even if the whitespace is intentional.
+- Cross-page measured left-margin difference above **9 mm**: `LEFT_MARGIN_INCONSISTENT` → REVIEW.
+
+These numbers are provisional guidance under `DSM-ES-VISUAL-PROPOSAL-v0.1`. They do **not** replace the design tokens staged in Draft PR #5 or prove a school-approved corporate visual standard. They apply to horizontal, extractable text runs only; other objects, complex tables, images, overlapping text, multilingual parallel column semantics, reading order and actual visible colors are not fully covered.
+
+Each PDF report retains `overall: REVIEW`, even if `layout_preflight` and `typography_preflight` are `PASS`. Other categories, including `institutional_design`, `visual_rendering`, `bilingual_layout`, `pdf_ua_accessibility`, `lrs_policy` and `educational_equivalence`, explicitly remain `NOT_TESTED`. The local canvas preview provides human inspection only; it is never an automated check.
+
+### Privacy and test strategy
+The only external resources loaded by the web page are public **same-origin** JavaScript modules and the versioned public JSON schema (for JSON validation). PDF content is processed client-side in a PDF.js worker; no document text, previews or filenames are transmitted. All GitHub tests use **synthetic PDFs only**. Private material, even when used to select a caution threshold, is never committed. A browser and user must be authorized to handle any sensitive document.
+
+After merge, confirm the main GitHub Pages site displays per-page measures and that the local preview changes pages without uploads. These measurements are approximate and should always be inspected visually.
+
+---
+
 ## V2c — real PDF.js parsing in the browser (pending deployment gates)
 
 V2c replaces the signature-only PDF preflight with Mozilla **pdfjs-dist v6.5.438**, installed by a pinned **GitHub Actions build** and hosted from this site's own `docs/vendor/pdfjs/` folder. There is no CDN dependency at runtime. PDF document bytes, filenames, content and reports are never sent to GitHub, Mozilla or another service by this validator.

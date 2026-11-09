@@ -7,8 +7,9 @@
  * a pedagogical/LRS decision, or formal institutional approval.
  */
 import {preflight as fallbackPreflight, MAX_INPUT_BYTES} from "./preflight-v2b.mjs";
+import {analyzeTextLayout,summarizeVisualPages} from "./visual-engine-v2d.mjs";
 
-export const ENGINE_VERSION="DSM-ES-VALIDATOR-002C/pdfjs-v0.1";
+export const ENGINE_VERSION="DSM-ES-VALIDATOR-002D/pdfjs-visual-v0.1";
 export const PDFJS_PIN="6.5.438";
 const MAX_PAGES=50;
 const MAX_ITEMS=250000;
@@ -34,11 +35,11 @@ function makeReport(overall,checks,findings,metrics){
  return {
    report_version:"2.2",engine_version:ENGINE_VERSION,
    pdfjs_version:PDFJS_PIN,
-   scope:"PDF page geometry and extractable text only, no full compliance",
+   scope:"PDF geometry, extractable text and preliminary layout/typography heuristics; no institutional conformity",
    file_type:"PDF",overall,not_an_official_approval:true,
    checks,findings,finding_count:findings.length,metrics,
    disclaimer:"Content stays on device. Manual visual and educational review required. "
-     +"No PDF/UA, permitted-brand-logo, translation, LRS, or actual rendered layout certification."
+     +"No PDF/UA, permitted-brand-logo, translation, LRS, or rendered-layout certification."
  };
 }
 function a4(w,h) {
@@ -114,6 +115,7 @@ export async function inspectPdf(bytesInput){
    }
    let a4Count=0,textCount=0,itemsCount=0,approxWords=0;
    let emptyTextPages=0;
+   const visualPages=[];
    for(let number=1;number<=pageCount;number++){
      const page=await document.getPage(number);
      try{
@@ -125,6 +127,10 @@ export async function inspectPdf(bytesInput){
          disableNormalization:false
        });
        const items=content.items||[];
+       visualPages.push(analyzeTextLayout({
+         pageNumber:number,width:viewport.width,height:viewport.height,
+         viewportTransform:viewport.transform,items
+       }));
        itemsCount+=items.length;
        if(itemsCount>MAX_ITEMS){
          checks.text_extractability="REVIEW";
@@ -151,6 +157,12 @@ export async function inspectPdf(bytesInput){
    metrics.empty_text_pages=emptyTextPages;
    metrics.text_items_examined=itemsCount;
    metrics.word_count_approx=Math.min(approxWords,1000000);
+   const visual=summarizeVisualPages(visualPages,pageCount);
+   metrics.visual_pages=visual.metrics;
+   metrics.visual_profile=visual.profile;
+   metrics.visual_profile_authority=visual.profile_authority;
+   findings.push(...visual.findings);
+   Object.assign(checks,visual.checks);
    if(a4Count!==pageCount){
      checks.page_geometry="REVIEW";
      findings.push(finding("page_geometry","NON_A4_PORTRAIT","REVIEW",
@@ -183,4 +195,88 @@ export async function inspectPdf(bytesInput){
      try {await task.destroy();}catch(_){}
    }
  }
+}
+
+
+/**
+ * Local, opt-in page preview. Raster pixels are written to the supplied browser
+ * canvas only; no preview pixels or PDF bytes are placed in the JSON report.
+ * Guide lines mark 12 mm from page edges (a caution threshold, not official DSM).
+ */
+function ensurePdfRenderCompat(){
+  // pdfjs-dist 6.x uses Map upsert in canvas rendering. Older still-supported
+  // browsers may lack the February 2026 built-in. Provide only this minimal
+  // spec-compatible method when missing (non-enumerable, no network).
+  if(typeof Map.prototype.getOrInsertComputed!=="function"){
+    Object.defineProperty(Map.prototype,"getOrInsertComputed",{
+      configurable:true,writable:true,
+      value:function(key,callback){
+        if(typeof callback!=="function")throw new TypeError("callback must be callable");
+        if(this.has(key))return this.get(key);
+        const result=callback(key);
+        this.set(key,result);
+        return result;
+      }
+    });
+  }
+  // PDF.js canvas graphics also uses WeakMap's new computed upsert method.
+  // Browser releases preceding the 2026 baseline may not provide this API.
+  if(typeof WeakMap.prototype.getOrInsertComputed!=="function"){
+    Object.defineProperty(WeakMap.prototype,"getOrInsertComputed",{
+      configurable:true,writable:true,
+      value:function(key,callback){
+        if(typeof callback!=="function")throw new TypeError("callback must be callable");
+        if(this.has(key))return this.get(key);
+        const result=callback(key);
+        this.set(key,result);
+        return result;
+      }
+    });
+  }
+}
+export async function renderLocalPdfPreview(bytesInput,pageNumber,canvas){
+  ensurePdfRenderCompat();
+  if(!(canvas instanceof HTMLCanvasElement))throw new Error("PREVIEW_CANVAS_REQUIRED");
+  const bytes=bytesInput instanceof Uint8Array?bytesInput:
+    bytesInput instanceof ArrayBuffer?new Uint8Array(bytesInput):null;
+  if(!bytes || bytes.length===0 || bytes.length>MAX_INPUT_BYTES)
+    throw new Error("PREVIEW_SIZE_INVALID");
+  if(!Number.isSafeInteger(pageNumber)||pageNumber<1||pageNumber>MAX_PAGES)
+    throw new Error("PREVIEW_PAGE_INVALID");
+  const pdfjs=await loadLocalPdfJs();
+  let task=null,page=null;
+  try{
+    task=pdfjs.getDocument({
+      data:bytes.slice(),stopAtErrors:true,enableXfa:false,isEvalSupported:false,
+      disableFontFace:true,useSystemFonts:false,useWasm:false,
+      disableAutoFetch:true,disableStream:true,verbosity:0
+    });
+    const pdf=await task.promise;
+    if(pageNumber>pdf.numPages)throw new Error("PREVIEW_PAGE_OUT_OF_RANGE");
+    page=await pdf.getPage(pageNumber);
+    const natural=page.getViewport({scale:1});
+    const scale=Math.min(1.4,800/natural.width,1150/natural.height);
+    const viewport=page.getViewport({scale});
+    const width=Math.round(viewport.width),height=Math.round(viewport.height);
+    if(width<1||height<1||width*height>1800000)
+      throw new Error("PREVIEW_CANVAS_LIMIT");
+    canvas.width=width;canvas.height=height;
+    const ctx=canvas.getContext("2d",{alpha:false});
+    if(!ctx)throw new Error("PREVIEW_CONTEXT_UNAVAILABLE");
+    await page.render({canvas,canvasContext:ctx,viewport,background:"#ffffff"}).promise;
+    // A 12-mm margin guide is a visual *proposal*, not an official corporate rule.
+    const guide=12/MM_PER_PT*scale;
+    ctx.save();
+    ctx.strokeStyle="rgba(23,103,139,.63)";
+    ctx.lineWidth=1;
+    ctx.setLineDash([7,5]);
+    ctx.strokeRect(guide,guide,width-2*guide,height-2*guide);
+    ctx.restore();
+    return {page:pageNumber,pages:pdf.numPages,pixel_width:width,pixel_height:height};
+  }finally{
+    if(page){try{page.cleanup();}catch(_){}}
+    if(task && typeof task.destroy==="function"){
+      try{await task.destroy();}catch(_){}
+    }
+  }
 }
