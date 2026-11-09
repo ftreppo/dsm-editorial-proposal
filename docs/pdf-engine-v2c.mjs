@@ -7,8 +7,9 @@
  * a pedagogical/LRS decision, or formal institutional approval.
  */
 import {preflight as fallbackPreflight, MAX_INPUT_BYTES} from "./preflight-v2b.mjs";
+import {analyzeTextLayout,summarizeVisualPages} from "./visual-engine-v2d.mjs";
 
-export const ENGINE_VERSION="DSM-ES-VALIDATOR-002C/pdfjs-v0.1";
+export const ENGINE_VERSION="DSM-ES-VALIDATOR-002D/pdfjs-visual-v0.1";
 export const PDFJS_PIN="6.5.438";
 const MAX_PAGES=50;
 const MAX_ITEMS=250000;
@@ -34,11 +35,11 @@ function makeReport(overall,checks,findings,metrics){
  return {
    report_version:"2.2",engine_version:ENGINE_VERSION,
    pdfjs_version:PDFJS_PIN,
-   scope:"PDF page geometry and extractable text only, no full compliance",
+   scope:"PDF geometry, extractable text and preliminary layout/typography heuristics; no institutional conformity",
    file_type:"PDF",overall,not_an_official_approval:true,
    checks,findings,finding_count:findings.length,metrics,
    disclaimer:"Content stays on device. Manual visual and educational review required. "
-     +"No PDF/UA, permitted-brand-logo, translation, LRS, or actual rendered layout certification."
+     +"No PDF/UA, permitted-brand-logo, translation, LRS, or rendered-layout certification."
  };
 }
 function a4(w,h) {
@@ -114,6 +115,7 @@ export async function inspectPdf(bytesInput){
    }
    let a4Count=0,textCount=0,itemsCount=0,approxWords=0;
    let emptyTextPages=0;
+   const visualPages=[];
    for(let number=1;number<=pageCount;number++){
      const page=await document.getPage(number);
      try{
@@ -125,6 +127,10 @@ export async function inspectPdf(bytesInput){
          disableNormalization:false
        });
        const items=content.items||[];
+       visualPages.push(analyzeTextLayout({
+         pageNumber:number,width:viewport.width,height:viewport.height,
+         viewportTransform:viewport.transform,items
+       }));
        itemsCount+=items.length;
        if(itemsCount>MAX_ITEMS){
          checks.text_extractability="REVIEW";
@@ -151,6 +157,12 @@ export async function inspectPdf(bytesInput){
    metrics.empty_text_pages=emptyTextPages;
    metrics.text_items_examined=itemsCount;
    metrics.word_count_approx=Math.min(approxWords,1000000);
+   const visual=summarizeVisualPages(visualPages,pageCount);
+   metrics.visual_pages=visual.metrics;
+   metrics.visual_profile=visual.profile;
+   metrics.visual_profile_authority=visual.profile_authority;
+   findings.push(...visual.findings);
+   Object.assign(checks,visual.checks);
    if(a4Count!==pageCount){
      checks.page_geometry="REVIEW";
      findings.push(finding("page_geometry","NON_A4_PORTRAIT","REVIEW",
