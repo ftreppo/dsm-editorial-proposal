@@ -107,7 +107,11 @@ class PDFJsBrowserV2c(unittest.TestCase):
     def test_pdf_a4_with_text_is_parsed_by_local_pdfjs(self):
         report=self.validate(make_pdf())
         self.assertEqual(report["overall"],"REVIEW")
-        self.assertEqual(report["engine_version"],"DSM-ES-VALIDATOR-002C/pdfjs-v0.1")
+        self.assertEqual(report["engine_version"],"DSM-ES-VALIDATOR-002D/pdfjs-visual-v0.1")
+        self.assertEqual(report["metrics"]["visual_profile"],"DSM-ES-VISUAL-PROPOSAL-v0.1")
+        self.assertEqual(len(report["metrics"]["visual_pages"]),1)
+        self.assertIn("layout_preflight",report["checks"])
+        self.assertIn("typography_preflight",report["checks"])
         self.assertEqual(report["pdfjs_version"],"6.5.438")
         self.assertEqual(report["metrics"]["pages"],1)
         self.assertEqual(report["metrics"]["a4_portrait_pages"],1)
@@ -116,6 +120,8 @@ class PDFJsBrowserV2c(unittest.TestCase):
         self.assertEqual(report["checks"]["text_extractability"],"PASS")
         self.assertEqual(report["checks"]["pdf_ua_accessibility"],"NOT_TESTED")
         self.assertEqual(report["checks"]["visual_rendering"],"NOT_TESTED")
+        self.assertEqual(report["checks"]["institutional_design"],"NOT_TESTED")
+        self.assertEqual(report["checks"]["bilingual_layout"],"NOT_TESTED")
         self.assertEqual(self.page.locator("#status").inner_text(),"REVIEW")
         self.assertFalse(any(f["code"]=="PDF_ENGINE_UNAVAILABLE" for f in report["findings"]))
 
@@ -130,6 +136,28 @@ class PDFJsBrowserV2c(unittest.TestCase):
         self.assertEqual(r["overall"],"REVIEW")
         self.assertEqual(r["checks"]["text_extractability"],"REVIEW")
         self.assertIn("PDF_TEXT_NOT_EXTRACTABLE",[f["code"] for f in r["findings"]])
+
+    def test_local_canvas_preview_with_margin_guides_and_navigation(self):
+        pdf=make_pdf(pages=2)
+        report=self.validate(pdf)
+        self.assertEqual(len(report["metrics"]["visual_pages"]),2)
+        self.page.locator("#previewOpen").click()
+        self.page.wait_for_function("document.querySelector('#previewCanvas').width > 0")
+        self.assertFalse(self.page.locator("#previewSection").is_hidden())
+        self.assertIn("Page 1 / 2",self.page.locator("#previewCount").inner_text())
+        self.assertGreater(self.page.locator("#previewCanvas").evaluate("(e)=>e.height"),500)
+        self.page.locator("#previewNext").click()
+        self.page.wait_for_function("document.querySelector('#previewCount').textContent.includes('Page 2 / 2')")
+        self.assertTrue(self.page.locator("#previewNext").is_disabled())
+
+    def test_visual_geometry_report_reveals_no_body_text(self):
+        report=self.validate(make_pdf())
+        layout=report["metrics"]["visual_pages"][0]
+        self.assertIn("margins",layout)
+        self.assertIn("median_text_size_pt",layout)
+        self.assertIn("maximum_text_size_pt",layout)
+        self.assertLess(layout["margins"]["left_mm"],25)
+        self.assertNotIn("Synthetic geometry",json.dumps(report))
 
     def test_multi_page_pdf_accounting(self):
         r=self.validate(make_pdf(pages=3))
