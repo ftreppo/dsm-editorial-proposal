@@ -1,0 +1,70 @@
+{
+  "version": "0.1",
+  "status": "PROPOSED_NOT_OFFICIAL",
+  "author": "Franco Treppo",
+  "date": "2026-11-08",
+  "sourcePolicy": "Do not reuse school logo without approval; colors and fonts below are non-canonical prototypes.",
+  "paper": {
+    "size": "A4",
+    "orientation": "portrait",
+    "marginMm": {
+      "top": 17,
+      "right": 18,
+      "bottom": 15,
+      "left": 18
+    }
+  },
+  "header": {
+    "maxHeightMm": 27,
+    "logoState": "APPROVED_ASSET_REQUIRED",
+    "logoMaxHeightMm": 13,
+    "bilingualName": true,
+    "documentRef": true,
+    "optionalContacts": true
+  },
+  "body": {
+    "fontFamily": "Arial, Helvetica, sans-serif",
+    "fontPointSize": 10.5,
+    "lineHeight": 1.4,
+    "titlePointSize": 14,
+    "sectionPointSize": 11.5,
+    "alignment": "left",
+    "contrast": "WCAG_CHECK_REQUIRED"
+  },
+  "color": {
+    "body": "#222222",
+    "muted": "#505050",
+    "background": "#FFFFFF",
+    "border": "#D8D8D8",
+    "officialBrandAccent": null,
+    "brandingState": "PENDING_VERIFICATION"
+  },
+  "language": {
+    "source": "de",
+    "support": [
+      "it"
+    ],
+    "responseLanguagesIndependent": true,
+    "parentDisplay": [
+      "SEQUENTIAL_FULL",
+      "COMPACT_PARAGRAPHS"
+    ],
+    "studentDisplay": [
+      "PARALLEL_A4",
+      "STACKED_MOBILE",
+      "SWITCHABLE_SINGLE_LANGUAGE"
+    ]
+  },
+  "answerArea": {
+    "sharedFullWidth": true,
+    "heightPerTask": true
+  },
+  "footer": {
+    "pageCounterOnly": true
+  },
+  "publication": {
+    "institutionalApprovalRequired": true,
+    "logoRightsRequired": true,
+    "notOfficial": true
+  }
+}
