@@ -203,7 +203,25 @@ export async function inspectPdf(bytesInput){
  * canvas only; no preview pixels or PDF bytes are placed in the JSON report.
  * Guide lines mark 12 mm from page edges (a caution threshold, not official DSM).
  */
+function ensurePdfRenderCompat(){
+  // pdfjs-dist 6.x uses Map upsert in canvas rendering. Older still-supported
+  // browsers may lack the February 2026 built-in. Provide only this minimal
+  // spec-compatible method when missing (non-enumerable, no network).
+  if(typeof Map.prototype.getOrInsertComputed!=="function"){
+    Object.defineProperty(Map.prototype,"getOrInsertComputed",{
+      configurable:true,writable:true,
+      value:function(key,callback){
+        if(typeof callback!=="function")throw new TypeError("callback must be callable");
+        if(this.has(key))return this.get(key);
+        const result=callback(key);
+        this.set(key,result);
+        return result;
+      }
+    });
+  }
+}
 export async function renderLocalPdfPreview(bytesInput,pageNumber,canvas){
+  ensurePdfRenderCompat();
   if(!(canvas instanceof HTMLCanvasElement))throw new Error("PREVIEW_CANVAS_REQUIRED");
   const bytes=bytesInput instanceof Uint8Array?bytesInput:
     bytesInput instanceof ArrayBuffer?new Uint8Array(bytesInput):null;
