@@ -38,6 +38,11 @@ button:hover:not(:disabled){filter:brightness(.9)}
 .status.FAIL,.status.INPUT_ERROR{color:#a12f29}
 .status.NOT_TESTED{color:var(--muted)}
 .report{display:none}
+.preview-canvas{display:block;max-width:100%;height:auto;border:1px solid var(--line);margin:12px auto;background:white}
+.preview-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#visualMetrics{font-size:.92rem;color:var(--muted);overflow-wrap:anywhere}
+#visualMetrics p{margin:5px 0}
+[hidden]{display:none!important}
 .report.visible{display:block}
 .finding{padding:12px 0;border-top:1px solid var(--line)}
 .finding strong{display:block}
@@ -83,9 +88,23 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;padd
    <h2 data-i18n="coverageTitle">Copertura</h2>
    <p class="fineprint" data-i18n="coverage">Non verificati: identità visiva, PDF/UA, equivalenza didattica, misure LRS, fedeltà all'originale e correttezza della traduzione.</p>
    <div id="reportHash" class="report-meta"></div>
+   <h2 data-i18n="visualTitle">Misure tipografiche e margini (indicative)</h2>
+   <div id="visualMetrics"></div>
    <div class="controls">
      <button type="button" class="secondary" id="save" data-i18n="save">Scarica il rapporto JSON</button>
+     <button type="button" class="secondary" id="previewOpen" data-i18n="previewOpen" hidden>Mostra anteprima PDF</button>
    </div>
+ </section>
+ <section id="previewSection" class="card" hidden aria-label="Anteprima PDF locale">
+   <h2 data-i18n="previewTitle">Anteprima PDF sul dispositivo</h2>
+   <p class="fineprint" data-i18n="previewExplanation">Linee tratteggiate: guida proposta a 12 mm dal bordo, non requisito ufficiale DSM. L’immagine rimane sul dispositivo e non entra nel rapporto.</p>
+   <div class="preview-controls">
+     <button type="button" id="previewPrev" class="secondary" data-i18n="previewPrev">Precedente</button>
+     <strong id="previewCount" role="status"></strong>
+     <button type="button" id="previewNext" class="secondary" data-i18n="previewNext">Successiva</button>
+   </div>
+   <canvas id="previewCanvas" class="preview-canvas" role="img" aria-label="Anteprima locale della pagina PDF con guida margini"></canvas>
+   <p id="previewStatus" class="fineprint" role="status"></p>
  </section>
  <p class="notice"><strong data-i18n="privacyHeading">Privacy e limiti.</strong> <span data-i18n="privacy">Il documento resta nel browser: soltanto gli asset pubblici del sito (schema JSON, libreria PDF.js e worker) vengono richiesti alla stessa origine. Nessun documento o rapporto viene caricato. PDF e DOCX restituiscono solo REVIEW o FAIL.</span></p>
  <p class="fineprint"><a href="https://github.com/ftreppo/dsm-editorial-proposal/blob/main/validator/README.md" target="_blank" rel="noopener" data-i18n="docs">Leggi i limiti e la CLI del validatore</a></p>
