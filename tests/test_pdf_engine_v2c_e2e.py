@@ -142,7 +142,7 @@ class PDFJsBrowserV2c(unittest.TestCase):
         report=self.validate(pdf)
         self.assertEqual(len(report["metrics"]["visual_pages"]),2)
         self.page.locator("#previewOpen").click()
-        self.page.wait_for_function("document.querySelector('#previewCanvas').width > 0")
+        self.page.wait_for_function("document.querySelector('#previewCanvas').width > 0 && document.querySelector('#previewCount').textContent.includes('Page 1 / 2')")
         self.assertFalse(self.page.locator("#previewSection").is_hidden())
         self.assertIn("Page 1 / 2",self.page.locator("#previewCount").inner_text())
         self.assertGreater(self.page.locator("#previewCanvas").evaluate("(e)=>e.height"),500)
