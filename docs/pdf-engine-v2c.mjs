@@ -196,3 +196,55 @@ export async function inspectPdf(bytesInput){
    }
  }
 }
+
+
+/**
+ * Local, opt-in page preview. Raster pixels are written to the supplied browser
+ * canvas only; no preview pixels or PDF bytes are placed in the JSON report.
+ * Guide lines mark 12 mm from page edges (a caution threshold, not official DSM).
+ */
+export async function renderLocalPdfPreview(bytesInput,pageNumber,canvas){
+  if(!(canvas instanceof HTMLCanvasElement))throw new Error("PREVIEW_CANVAS_REQUIRED");
+  const bytes=bytesInput instanceof Uint8Array?bytesInput:
+    bytesInput instanceof ArrayBuffer?new Uint8Array(bytesInput):null;
+  if(!bytes || bytes.length===0 || bytes.length>MAX_INPUT_BYTES)
+    throw new Error("PREVIEW_SIZE_INVALID");
+  if(!Number.isSafeInteger(pageNumber)||pageNumber<1||pageNumber>MAX_PAGES)
+    throw new Error("PREVIEW_PAGE_INVALID");
+  const pdfjs=await loadLocalPdfJs();
+  let task=null,page=null;
+  try{
+    task=pdfjs.getDocument({
+      data:bytes.slice(),stopAtErrors:true,enableXfa:false,isEvalSupported:false,
+      disableFontFace:true,useSystemFonts:false,useWasm:false,
+      disableAutoFetch:true,disableStream:true,verbosity:0
+    });
+    const pdf=await task.promise;
+    if(pageNumber>pdf.numPages)throw new Error("PREVIEW_PAGE_OUT_OF_RANGE");
+    page=await pdf.getPage(pageNumber);
+    const natural=page.getViewport({scale:1});
+    const scale=Math.min(1.4,800/natural.width,1150/natural.height);
+    const viewport=page.getViewport({scale});
+    const width=Math.round(viewport.width),height=Math.round(viewport.height);
+    if(width<1||height<1||width*height>1800000)
+      throw new Error("PREVIEW_CANVAS_LIMIT");
+    canvas.width=width;canvas.height=height;
+    const ctx=canvas.getContext("2d",{alpha:false});
+    if(!ctx)throw new Error("PREVIEW_CONTEXT_UNAVAILABLE");
+    await page.render({canvas,canvasContext:ctx,viewport,background:"#ffffff"}).promise;
+    // A 12-mm margin guide is a visual *proposal*, not an official corporate rule.
+    const guide=12/MM_PER_PT*scale;
+    ctx.save();
+    ctx.strokeStyle="rgba(23,103,139,.63)";
+    ctx.lineWidth=1;
+    ctx.setLineDash([7,5]);
+    ctx.strokeRect(guide,guide,width-2*guide,height-2*guide);
+    ctx.restore();
+    return {page:pageNumber,pages:pdf.numPages,pixel_width:width,pixel_height:height};
+  }finally{
+    if(page){try{page.cleanup();}catch(_){}}
+    if(task && typeof task.destroy==="function"){
+      try{await task.destroy();}catch(_){}
+    }
+  }
+}
