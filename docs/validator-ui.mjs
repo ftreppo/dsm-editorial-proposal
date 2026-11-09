@@ -1,6 +1,6 @@
 import {validateDocument, MAX_BYTES, ENGINE_VERSION} from "./validator-v1.mjs";
 import {preflight,MAX_INPUT_BYTES,ENGINE_VERSION as BINARY_ENGINE} from "./preflight-v2b.mjs";
-import {inspectPdf,ENGINE_VERSION as PDF_ENGINE} from "./pdf-engine-v2c.mjs";
+import {inspectPdf,renderLocalPdfPreview,ENGINE_VERSION as PDF_ENGINE} from "./pdf-engine-v2c.mjs";
 
 const ui = {
   it: {
@@ -20,7 +20,13 @@ const ui = {
     passing:"Nessun problema riscontrato nei soli controlli strutturali V1.",
     reviewing:"Sono necessarie verifiche o approvazioni umane.",
     failing:"Sono presenti errori strutturali o di metadati.",
-    noIssues:"Nessuna osservazione per le regole V1.",hasher:"SHA-256 del file",
+    visualTitle:"Misure tipografiche e margini (indicative)",
+    previewOpen:"Mostra anteprima PDF",previewTitle:"Anteprima PDF sul dispositivo",
+    previewExplanation:"Linee tratteggiate: guida proposta a 12 mm dal bordo, non requisito ufficiale DSM. L’immagine non entra nel rapporto.",
+    previewPrev:"Precedente",previewNext:"Successiva",previewUnavailable:"Anteprima non disponibile.",
+    previewWaiting:"Rendering sul dispositivo…",pageShort:"Pagina",marginText:"margini S/A/D/B",
+    fontText:"mediana testo",previewPageOf:(n,m)=>"Pagina "+n+" / "+m,
+    noIssues:"Nessuna osservazione per le regole eseguite.",hasher:"SHA-256 del file",
     noHash:"non disponibile nel browser",version:"Motore"
   },
   de: {
@@ -40,7 +46,13 @@ const ui = {
     passing:"Keine Probleme in den ausgeführten Strukturprüfungen V1 gefunden.",
     reviewing:"Menschliche Prüfung oder Freigabe ist erforderlich.",
     failing:"Struktur- oder Metadatenfehler gefunden.",
-    noIssues:"Keine Befunde für V1-Regeln.",hasher:"Datei-SHA-256",
+    visualTitle:"Text- und Randmaße (Näherungswerte)",
+    previewOpen:"PDF-Vorschau anzeigen",previewTitle:"Lokale PDF-Vorschau",
+    previewExplanation:"Gestrichelte Linien: vorgeschlagene 12-mm-Randhilfe, keine offizielle DSM-Vorgabe. Das Bild wird nicht gespeichert.",
+    previewPrev:"Zurück",previewNext:"Weiter",previewUnavailable:"Vorschau nicht verfügbar.",
+    previewWaiting:"Lokale Darstellung läuft…",pageShort:"Seite",marginText:"Rand L/O/R/U",
+    fontText:"Median Schrift",previewPageOf:(n,m)=>"Seite "+n+" / "+m,
+    noIssues:"Keine Befunde für ausgeführte Regeln.",hasher:"Datei-SHA-256",
     noHash:"im Browser nicht verfügbar",version:"Prüfmodul"
   },
   en: {
@@ -60,7 +72,13 @@ const ui = {
     passing:"No issues found within the V1 structural checks.",
     reviewing:"Human review or approval is still required.",
     failing:"Document structure or metadata failed validation.",
-    noIssues:"No findings for V1 rules.",hasher:"File SHA-256",
+    visualTitle:"Measured text and margins (approximate)",
+    previewOpen:"Show local PDF preview",previewTitle:"On-device PDF preview",
+    previewExplanation:"Dashed lines: proposed 12 mm caution guide, not official DSM design. Preview pixels are not in the report.",
+    previewPrev:"Previous",previewNext:"Next",previewUnavailable:"Preview unavailable.",
+    previewWaiting:"Rendering on device…",pageShort:"Page",marginText:"margins L/T/R/B",
+    fontText:"text median",previewPageOf:(n,m)=>"Page "+n+" / "+m,
+    noIssues:"No findings for the executed rules.",hasher:"File SHA-256",
     noHash:"not available in this browser",version:"Engine"
   }
 };
@@ -70,6 +88,8 @@ let lang = new URLSearchParams(window.location.search).get("lang") || "it";
 if(!ui[lang]) lang="it";
 let latest = null;
 let schemaCache = null;
+let activePdfFile=null;
+let previewPage=1;
 
 function applyLanguage(value) {
   if (!ui[value]) return;
@@ -123,6 +143,22 @@ function render(report) {
   $("reportHash").textContent=tr.version+": "+report.engine_version+"\n"+
     tr.hasher+": "+(report.input_sha256||tr.noHash);
   $("save").disabled=report.overall==="INPUT_ERROR";
+  $("previewOpen").hidden=!(report.file_type==="PDF" &&
+    report.engine_version===PDF_ENGINE && report.overall==="REVIEW");
+  const visual=$("visualMetrics");
+  visual.replaceChildren();
+  const pages=report.metrics?.visual_pages;
+  if(Array.isArray(pages)){
+    for(const p of pages){
+      if(!p.margins)continue;
+      const line=document.createElement("p");
+      const m=p.margins;
+      line.textContent=tr.pageShort+" "+p.page+" · "+tr.marginText+": "+
+        [m.left_mm,m.top_mm,m.right_mm,m.bottom_mm].join(" / ")+" mm · "+
+        tr.fontText+": "+p.median_text_size_pt+" pt";
+      visual.appendChild(line);
+    }
+  }
 }
 async function getSchema(){
   if(schemaCache)return schemaCache;
@@ -138,6 +174,11 @@ async function getHash(buffer) {
   const bytes=await crypto.subtle.digest("SHA-256",buffer);
   return Array.from(new Uint8Array(bytes)).map(x=>x.toString(16).padStart(2,"0")).join("");
 }
+fileInput.addEventListener("change",()=>{
+  latest=null;activePdfFile=null;previewPage=1;
+  reportSection.classList.remove("visible");
+  $("previewSection").hidden=true;
+});
 runButton.addEventListener("click",async()=>{
   const file=fileInput.files?.[0];
   if(!file) {reportError("noFile");return;}
@@ -145,6 +186,7 @@ runButton.addEventListener("click",async()=>{
   if(!ext){reportError("invalid");return;}
   if(file.size > (ext==="json"?MAX_BYTES:MAX_INPUT_BYTES)){reportError("oversize");return;}
   runButton.disabled=true;runButton.textContent=ui[lang].busy;
+  activePdfFile=null;$("previewSection").hidden=true;
   try {
     const buffer=await file.arrayBuffer();
     let validation;
@@ -160,6 +202,7 @@ runButton.addEventListener("click",async()=>{
     }
     const input_sha256=await getHash(buffer);
     latest={...validation,input_sha256};
+    activePdfFile=ext==="pdf" && validation.engine_version===PDF_ENGINE && validation.overall==="REVIEW" ? file:null;
     render(latest);
   } catch(_){reportError("invalid");}
   finally{runButton.disabled=false;runButton.textContent=ui[lang].run;}
@@ -171,3 +214,29 @@ $("save").addEventListener("click",()=>{
   link.href=url;link.download="dsm-es-validation-report.json";document.body.append(link);link.click();link.remove();
   setTimeout(()=>URL.revokeObjectURL(url),500);
 });
+
+async function showPreview(pageNumber){
+  if(!activePdfFile||!latest||latest.engine_version!==PDF_ENGINE)return;
+  const total=latest.metrics?.pages;
+  if(!Number.isSafeInteger(total)||pageNumber<1||pageNumber>total)return;
+  const tr=ui[lang],prev=$("previewPrev"),next=$("previewNext"),stat=$("previewStatus");
+  $("previewSection").hidden=false;
+  stat.textContent=tr.previewWaiting;
+  prev.disabled=true;next.disabled=true;
+  try{
+    const buffer=await activePdfFile.arrayBuffer();
+    const rendered=await renderLocalPdfPreview(buffer,pageNumber,$("previewCanvas"));
+    previewPage=rendered.page;
+    $("previewCount").textContent=tr.previewPageOf(previewPage,rendered.pages);
+    stat.textContent="";
+  }catch(_){
+    stat.textContent=tr.previewUnavailable;
+    $("previewCanvas").width=0;$("previewCanvas").height=0;
+  }finally{
+    prev.disabled=previewPage<=1;
+    next.disabled=previewPage>=total;
+  }
+}
+$("previewOpen").addEventListener("click",()=>showPreview(1));
+$("previewPrev").addEventListener("click",()=>showPreview(previewPage-1));
+$("previewNext").addEventListener("click",()=>showPreview(previewPage+1));
