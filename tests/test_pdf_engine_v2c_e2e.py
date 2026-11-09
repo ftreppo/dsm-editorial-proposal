@@ -142,7 +142,19 @@ class PDFJsBrowserV2c(unittest.TestCase):
         report=self.validate(pdf)
         self.assertEqual(len(report["metrics"]["visual_pages"]),2)
         self.page.locator("#previewOpen").click()
-        self.page.wait_for_function("document.querySelector('#previewCanvas').width > 0 && document.querySelector('#previewCount').textContent.includes('Page 1 / 2')")
+        self.page.wait_for_function("document.querySelector('#previewCount').textContent.includes('Page 1 / 2') || document.querySelector('#previewStatus').textContent.includes('unavailable')", timeout=12000)
+        if "Page 1 / 2" not in self.page.locator("#previewCount").inner_text():
+            diagnostic=self.page.evaluate("""async () => {
+              try {
+                const m=await import("./pdf-engine-v2c.mjs");
+                const file=document.querySelector("#documentFile").files[0];
+                const c=document.querySelector("#previewCanvas");
+                const result=await m.renderLocalPdfPreview(await file.arrayBuffer(),1,c);
+                return {result};
+              }catch(err){return {error:String(err?.message||err),name:String(err?.name)};}
+            }""")
+            self.fail("Preview unavailable for synthetic PDF: "+json.dumps(diagnostic))
+
         self.assertFalse(self.page.locator("#previewSection").is_hidden())
         self.assertIn("Page 1 / 2",self.page.locator("#previewCount").inner_text())
         self.assertGreater(self.page.locator("#previewCanvas").evaluate("(e)=>e.height"),500)
